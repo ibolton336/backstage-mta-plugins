@@ -75,13 +75,13 @@ export class MTAProvider implements EntityProvider {
         return;
       }
 
-      const applications = await this.fetchApplications(tokenSet.access_token);
-      if (applications.length === 0) {
-        this.logger.error('No applications found');
-        return;
-      }
+      //   const applications = await this.fetchApplications(tokenSet.access_token);
+      //   if (applications.length === 0) {
+      //     this.logger.error('No applications found');
+      //     return;
+      //   }
 
-      await this.processApplications(applications);
+      //   await this.processApplications(applications);
     } catch (error) {
       this.logger.error(`Run method failed: ${error}`);
     }
