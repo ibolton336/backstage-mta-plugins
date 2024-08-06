@@ -40,8 +40,6 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs/alpha'));
 
 // new plugin
 
-// backend.add(import('@internal/backstage-plugin-simple-chat-backend'));
-
 backend.add(
   import(
     '@internal/backstage-plugin-catalog-backend-module-mta-entity-provider'
