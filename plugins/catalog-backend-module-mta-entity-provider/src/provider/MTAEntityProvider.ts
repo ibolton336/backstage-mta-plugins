@@ -81,7 +81,7 @@ export class MTAProvider implements EntityProvider {
         return;
       }
 
-      //   await this.processApplications(applications);
+      await this.processApplications(applications);
     } catch (error) {
       this.logger.error(`Run method failed: ${error}`);
     }
