@@ -3,8 +3,8 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
-import { MTAProvider } from './provider/mtaEntityProvider';
 import { loggerToWinstonLogger } from '@backstage/backend-common';
+import { MTAProvider } from './provider/MTAEntityProvider';
 
 export const catalogModuleMtaEntityProvider = createBackendModule({
   pluginId: 'catalog',

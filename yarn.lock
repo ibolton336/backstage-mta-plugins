@@ -7195,7 +7195,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@internal/backstage-plugin-simple-chat-backend@^0.1.0, @internal/backstage-plugin-simple-chat-backend@workspace:plugins/simple-chat-backend":
+"@internal/backstage-plugin-simple-chat-backend@workspace:plugins/simple-chat-backend":
   version: 0.0.0-use.local
   resolution: "@internal/backstage-plugin-simple-chat-backend@workspace:plugins/simple-chat-backend"
   dependencies:
@@ -15352,7 +15352,6 @@ __metadata:
     "@backstage/plugin-techdocs-backend": ^1.10.4
     "@internal/backstage-plugin-catalog-backend-module-mta-entity-provider": ^0.1.0
     "@internal/backstage-plugin-mta-backend": ^0.1.0
-    "@internal/backstage-plugin-simple-chat-backend": ^0.1.0
     "@types/dockerode": ^3.3.0
     "@types/express": ^4.17.6
     "@types/express-serve-static-core": ^4.17.5

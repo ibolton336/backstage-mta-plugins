@@ -51,25 +51,25 @@ mta:
     clientID: backstage-provider
   # visibility: frontend
 
-integrations:
-  github:
-    - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: ${GITHUB_TOKEN}
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
-proxy:
-  '/mta-proxy':
-    # target: 'https://mta-openshift-mta.ibolton-dev-cluster-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
-    # target: 'https://mta-openshift-mta.ibolton-dev-cluster-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
-    target: 'https://mta-openshift-mta.mycluster-wdc04-b3c-4x16-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
-    changeOrigin: true
-    secure: true
-    headers:
-      Authorization: 'Bearer ${MTA_AUTH_TOKEN}'  # This should be set in your environment variables
+# integrations:
+#   github:
+#     - host: github.com
+#       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+#       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
+#       token: ${GITHUB_TOKEN}
+#     ### Example for how to add your GitHub Enterprise instance using the API:
+#     # - host: ghe.example.net
+#     #   apiBaseUrl: https://ghe.example.net/api/v3
+#     #   token: ${GHE_TOKEN}
+# proxy:
+#   '/mta-proxy':
+#     # target: 'https://mta-openshift-mta.ibolton-dev-cluster-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
+#     # target: 'https://mta-openshift-mta.ibolton-dev-cluster-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
+#     target: 'https://mta-openshift-mta.mycluster-wdc04-b3c-4x16-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud'
+#     changeOrigin: true
+#     secure: true
+#     headers:
+#       Authorization: 'Bearer ${MTA_AUTH_TOKEN}'  # This should be set in your environment variables
 
 # proxy:
 #   skipInvalidProxies: true

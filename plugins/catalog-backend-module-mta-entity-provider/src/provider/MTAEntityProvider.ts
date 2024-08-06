@@ -1,6 +1,6 @@
 import { ComponentEntityV1alpha1 } from '@backstage/catalog-model';
 import { Config } from '@backstage/config';
-import { Issuer, generators } from 'openid-client';
+import { Issuer, generators, custom } from 'openid-client';
 import {
   EntityProvider,
   EntityProviderConnection,
@@ -52,12 +52,12 @@ export class MTAProvider implements EntityProvider {
   async connect(connection: EntityProviderConnection): Promise<void> {
     this.logger.info('connecting');
     this.connection = connection;
-    // this.scheduler.scheduleTask({
-    //   frequency: { seconds: 5 },
-    //   timeout: { seconds: 30 },
-    //   id: 'sync-mta-catalog',
-    //   fn: this.run,
-    // });
+    this.scheduler.scheduleTask({
+      frequency: { seconds: 5 },
+      timeout: { seconds: 30 },
+      id: 'sync-mta-catalog',
+      fn: this.run,
+    });
     await this.run();
   }
 
@@ -75,11 +75,11 @@ export class MTAProvider implements EntityProvider {
         return;
       }
 
-      //   const applications = await this.fetchApplications(tokenSet.access_token);
-      //   if (applications.length === 0) {
-      //     this.logger.error('No applications found');
-      //     return;
-      //   }
+      const applications = await this.fetchApplications(tokenSet.access_token);
+      if (applications.length === 0) {
+        this.logger.error('No applications found');
+        return;
+      }
 
       //   await this.processApplications(applications);
     } catch (error) {
@@ -92,17 +92,113 @@ export class MTAProvider implements EntityProvider {
   // }
   // this.logger.info('here');
   async authenticate() {
-    const baseURLAuth = `${this.config.getString(
-      'mta.url',
-    )}/auth/realms/${this.config.getString('mta.providerAuth.realm')}`;
-    const mtaAuthIssuer = await Issuer.discover(baseURLAuth);
+    // try {
+    //   //   const baseURLAuth = `${this.config.getString(
+    //   //     'mta.url',
+    //   //   )}/auth/realms/${this.config.getString('mta.providerAuth.realm')}`;
+    //   const baseUrl = this.config.getString('mta.url');
+    //   const baseUrlHub = `${baseUrl}/hub`;
+    //   const baseUrlMta = `${baseUrl}`;
+    //   const realm = this.config.getString('mta.providerAuth.realm');
+    //   const clientID = this.config.getString('mta.providerAuth.clientID');
+    //   const secret = this.config.getString('mta.providerAuth.secret');
+    //   const baseURLAuth = `${baseUrl}/auth/realms/${realm}`;
+    //   this.logger.info(`Discovering issuer from ${baseURLAuth}`);
+
+    //   //   const mtaAuthIssuer = await Issuer.discover(baseURLAuth);
+    //   custom.setHttpOptionsDefaults({
+    //     timeout: 5000, // Adjust the timeout to 5000ms or higher based on your requirements
+    //   });
+
+    //   try {
+    //     const mtaAuthIssuer = await Issuer.discover(baseURLAuth);
+    //     this.logger.info('Issuer discovered successfully');
+
+    //     const authClient = new mtaAuthIssuer.Client({
+    //       client_id: this.config.getString('mta.providerAuth.clientID'),
+    //       client_secret: this.config.getString('mta.providerAuth.secret'),
+    //       response_types: ['code'],
+    //     });
+
+    //     this.logger.info('Client created successfully');
+
+    //     const code_verifier = generators.codeVerifier();
+    //     const code_challenge = generators.codeChallenge(code_verifier);
+
+    //     this.logger.info('Attempting to obtain grant');
+
+    //     const grant = await authClient.grant({
+    //       grant_type: 'client_credentials',
+    //     });
+
+    //     this.logger.info('Grant obtained successfully');
+
+    //     return grant;
+    //   } catch (error) {
+    //     this.logger.error(
+    //       `Initial discovery failed: ${error.message}, retrying...`,
+    //     );
+    //     // Implement retry logic here
+    //   }
+    // } catch (error) {
+    //   this.logger.error(`Authentication error: ${error.message}`);
+    //   throw new Error(`Failed to authenticate: ${error.message}`);
+    // }
+    const baseUrl = this.config.getString('mta.url');
+    const realm = this.config.getString('mta.providerAuth.realm');
+    const clientID = this.config.getString('mta.providerAuth.clientID');
+    const secret = this.config.getString('mta.providerAuth.secret');
+    const baseURLAuth = `${baseUrl}/auth/realms/${realm}`;
+    this.logger.info(`Discovering issuer from ${baseURLAuth}`);
+
+    custom.setHttpOptionsDefaults({
+      timeout: 5000, // Extend timeout to 5000ms
+    });
+
+    let mtaAuthIssuer;
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        mtaAuthIssuer = await Issuer.discover(baseURLAuth);
+        this.logger.info('Issuer discovered successfully');
+        break; // Exit loop on success
+      } catch (error) {
+        this.logger.error(
+          `Attempt ${attempt}: Discovery failed - ${error.message}`,
+        );
+        if (attempt === maxRetries) {
+          throw new Error(
+            `Failed to discover issuer after ${maxRetries} attempts: ${error.message}`,
+          );
+        }
+      }
+    }
+    if (!mtaAuthIssuer) {
+      throw new Error('Failed to discover issuer');
+    }
     const authClient = new mtaAuthIssuer.Client({
-      client_id: this.config.getString('mta.providerAuth.clientID'),
-      client_secret: this.config.getString('mta.providerAuth.secret'),
+      client_id: clientID,
+      client_secret: secret,
       response_types: ['code'],
     });
 
-    return authClient.grant({ grant_type: 'client_credentials' });
+    this.logger.info('Client created successfully');
+
+    const code_verifier = generators.codeVerifier();
+    const code_challenge = generators.codeChallenge(code_verifier);
+
+    this.logger.info('Attempting to obtain grant');
+
+    try {
+      const grant = await authClient.grant({
+        grant_type: 'client_credentials',
+      });
+      this.logger.info('Grant obtained successfully');
+      return grant;
+    } catch (error) {
+      this.logger.error(`Error obtaining grant: ${error.message}`);
+      throw new Error(`Failed to obtain grant: ${error.message}`);
+    }
   }
 
   async fetchApplications(accessToken) {
