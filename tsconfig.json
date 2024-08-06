@@ -8,6 +8,8 @@
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "dist-types",
     "rootDir": "."
   }

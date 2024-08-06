@@ -38,4 +38,14 @@ backend.add(import('@backstage/plugin-search-backend/alpha'));
 backend.add(import('@backstage/plugin-search-backend-module-catalog/alpha'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs/alpha'));
 
+// new plugin
+
+backend.add(
+  import(
+    '@internal/backstage-plugin-catalog-backend-module-mta-entity-provider'
+  ),
+);
+backend.add(import('@internal/backstage-plugin-scaffolder-backend-module-mta'));
+backend.add(import('@internal/backstage-plugin-mta-backend'));
+
 backend.start();
