@@ -2636,7 +2636,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/app-defaults@npm:^1.5.4":
+"@backstage/app-defaults@npm:^1.5.4, @backstage/app-defaults@npm:^1.5.9":
   version: 1.5.9
   resolution: "@backstage/app-defaults@npm:1.5.9"
   dependencies:
@@ -3556,6 +3556,30 @@ __metadata:
     react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
     react-router-dom: 6.0.0-beta.0 || ^6.3.0
   checksum: 490295c126eff7f7f3107565097bc3dbdda5b72e52301a6c47fab91429961aff5757ba91208cbe12c37f90d429703919ab6067a30c394249ec792d900308d309
+  languageName: node
+  linkType: hard
+
+"@backstage/dev-utils@npm:^1.0.35":
+  version: 1.0.36
+  resolution: "@backstage/dev-utils@npm:1.0.36"
+  dependencies:
+    "@backstage/app-defaults": ^1.5.9
+    "@backstage/catalog-model": ^1.5.0
+    "@backstage/core-app-api": ^1.14.1
+    "@backstage/core-components": ^0.14.9
+    "@backstage/core-plugin-api": ^1.9.3
+    "@backstage/integration-react": ^1.1.29
+    "@backstage/plugin-catalog-react": ^1.12.2
+    "@backstage/theme": ^0.5.6
+    "@material-ui/core": ^4.12.2
+    "@material-ui/icons": ^4.9.1
+    "@types/react": ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-use: ^17.2.4
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-router-dom: 6.0.0-beta.0 || ^6.3.0
+  checksum: 2e8d32041c87f7a1aed741eb78027d43ec6ba1f662f1f9405cdfea8d2d4e6f391640902f118a6bb00ddb2e01f8b6fb7e1abbac2730a66f7e1c5b32381734d125
   languageName: node
   linkType: hard
 
@@ -6455,6 +6479,31 @@ __metadata:
     msw: ^2.3.1
     node-fetch: ^2.6.7
     supertest: ^6.2.4
+  languageName: unknown
+  linkType: soft
+
+"@internal/backstage-plugin-simple-chat@^0.1.0, @internal/backstage-plugin-simple-chat@workspace:plugins/simple-chat":
+  version: 0.0.0-use.local
+  resolution: "@internal/backstage-plugin-simple-chat@workspace:plugins/simple-chat"
+  dependencies:
+    "@backstage/cli": ^0.26.3
+    "@backstage/core-app-api": ^1.12.4
+    "@backstage/core-components": ^0.14.9
+    "@backstage/core-plugin-api": ^1.9.3
+    "@backstage/dev-utils": ^1.0.35
+    "@backstage/test-utils": ^1.5.4
+    "@backstage/theme": ^0.5.6
+    "@material-ui/core": ^4.9.13
+    "@material-ui/icons": ^4.9.1
+    "@material-ui/lab": 4.0.0-alpha.61
+    "@testing-library/jest-dom": ^6.0.0
+    "@testing-library/react": ^14.0.0
+    "@testing-library/user-event": ^14.0.0
+    msw: ^1.0.0
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-use: ^17.2.4
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
   languageName: unknown
   linkType: soft
 
@@ -13519,6 +13568,7 @@ __metadata:
     "@backstage/plugin-user-settings": ^0.8.5
     "@backstage/test-utils": ^1.5.4
     "@backstage/theme": ^0.5.3
+    "@internal/backstage-plugin-simple-chat": ^0.1.0
     "@material-ui/core": ^4.12.2
     "@material-ui/icons": ^4.9.1
     "@playwright/test": ^1.32.3
@@ -28561,7 +28611,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.0.2":
+"react@npm:^16.13.1 || ^17.0.0 || ^18.0.0, react@npm:^18.0.2":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:
