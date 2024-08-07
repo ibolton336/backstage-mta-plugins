@@ -52,6 +52,5 @@
     "dist",
     "dist-dynamic/*.*",
     "dist-dynamic/dist/**"
-
   ]
 }
