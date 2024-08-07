@@ -205,7 +205,7 @@ export async function createRouter(
     response.redirect(continueTo?.toString() ?? frontEndBaseURL);
   });
 
-  router.get('/health', async (request, response) => {
+  router.get('/health', async (_, response) => {
     logger.info('PING!');
     response.json({ status: 'ok' });
   });
@@ -215,7 +215,7 @@ export async function createRouter(
     response.json({ status: 'ok' });
   });
 
-  router.get('/targets', async (request, response) => {
+  router.get('/targets', async (_, response) => {
     const getResponse = fetch(`${baseURLHub}/targets`, {
       credentials: 'include',
       headers: {
@@ -235,7 +235,7 @@ export async function createRouter(
     response.json(j);
   });
 
-  router.get('/applications', async (request, response) => {
+  router.get('/applications', async (_, response) => {
     const getResponse = fetch(`${baseURLHub}/applications`, {
       credentials: 'include',
       headers: {
@@ -287,7 +287,7 @@ export async function createRouter(
     response.json(j);
   });
 
-  router.get('/entities', async (request, response) => {
+  router.get('/entities', async (_, response) => {
     try {
       const entities = await entityApplicationStorage.getAllEntities();
 
@@ -361,7 +361,7 @@ export async function createRouter(
     async (request, response) => {
       const applicationId = request.params.applicationId;
       const analysisOptions = request.body; // Assuming all other required options are passed in the body
-      const { application, targetList, type } = analysisOptions;
+      const { application, targetList } = analysisOptions;
 
       logger.info(
         'Received request to analyze application:',
@@ -528,9 +528,7 @@ export async function createRouter(
           },
         };
         console.log('submitted taskgroup', taskgroupResponse);
-        const submitTaskgroupResponse = await submitTaskgroup(
-          taskgroupResponse,
-        );
+        await submitTaskgroup(taskgroupResponse);
         logger.info(
           `Taskgroup submitted. Status: ${response?.status ?? 'unknown'}`,
         );

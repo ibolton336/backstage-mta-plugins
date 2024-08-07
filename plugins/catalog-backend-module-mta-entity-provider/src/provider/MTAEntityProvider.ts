@@ -1,15 +1,11 @@
-import { ComponentEntityV1alpha1 } from '@backstage/catalog-model';
 import { Config } from '@backstage/config';
-import { Issuer, generators, custom } from 'openid-client';
+import { Issuer, custom } from 'openid-client';
 import {
   EntityProvider,
   EntityProviderConnection,
 } from '@backstage/plugin-catalog-node';
 import { Logger } from 'winston';
 import { SchedulerService } from '@backstage/backend-plugin-api';
-import { MTAComponentEntity } from './mtaComponentEntity';
-import { LocationSpec } from '@backstage/plugin-catalog-common';
-import { locationSpecToLocationEntity } from '@backstage/plugin-catalog-node';
 //
 /**
  * Provides entities from fictional frobs service.
@@ -162,9 +158,9 @@ export class MTAProvider implements EntityProvider {
         mtaAuthIssuer = await Issuer.discover(baseURLAuth);
         this.logger.info('Issuer discovered successfully');
         break; // Exit loop on success
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(
-          `Attempt ${attempt}: Discovery failed - ${error.message}`,
+          `Attempt ${attempt}: Discovery failed - ${error?.message}`,
         );
         if (attempt === maxRetries) {
           throw new Error(
@@ -184,9 +180,6 @@ export class MTAProvider implements EntityProvider {
 
     this.logger.info('Client created successfully');
 
-    const code_verifier = generators.codeVerifier();
-    const code_challenge = generators.codeChallenge(code_verifier);
-
     this.logger.info('Attempting to obtain grant');
 
     try {
@@ -195,13 +188,13 @@ export class MTAProvider implements EntityProvider {
       });
       this.logger.info('Grant obtained successfully');
       return grant;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error obtaining grant: ${error.message}`);
       throw new Error(`Failed to obtain grant: ${error.message}`);
     }
   }
 
-  async fetchApplications(accessToken) {
+  async fetchApplications(accessToken: string) {
     const url = `${this.config.getString('mta.url')}/hub/applications`;
     this.logger.info(`Attempting to fetch applications from ${url}`);
 
@@ -227,15 +220,15 @@ export class MTAProvider implements EntityProvider {
     return response.json();
   }
 
-  async processApplications(applications) {
+  async processApplications(applications: any) {
     try {
       // Map applications to entities
-      const entities = applications.map(app =>
+      const entities = applications.map((app: any) =>
         this.mapApplicationToEntity(app),
       );
 
       // Apply mutations to update the catalog
-      await this.connection.applyMutation({
+      await this.connection?.applyMutation({
         type: 'full',
         entities: entities,
       });
@@ -245,7 +238,7 @@ export class MTAProvider implements EntityProvider {
         'Successfully processed applications, refreshing data...',
       );
       await this.refreshData(entities);
-    } catch (error) {
+    } catch (error: any) {
       // Log detailed error messages
       this.logger.error(`Error processing applications: ${error.message}`, {
         error,
@@ -254,7 +247,7 @@ export class MTAProvider implements EntityProvider {
     }
   }
 
-  mapApplicationToEntity(application) {
+  mapApplicationToEntity(application: any) {
     // Example mapping logic, which you should customize based on your application structure
     const name = application.name.replace(/ /g, '-');
     const encodedAppName = encodeURIComponent(JSON.stringify(application.name));
@@ -292,10 +285,10 @@ export class MTAProvider implements EntityProvider {
     };
   }
 
-  async refreshData(entities) {
+  async refreshData(entities: any) {
     // Refresh logic, such as refreshing entity keys or other post-update tasks
-    const keys = entities.map(entity => entity.key);
-    await this.connection.refresh({ keys });
+    const keys = entities.map((entity: any) => entity.key);
+    await this.connection?.refresh({ keys });
     this.logger.info('Data refresh triggered for entities.');
   }
 }
