@@ -2,27 +2,34 @@ import { resolvePackagePath } from '@backstage/backend-common';
 import { Knex } from 'knex';
 import { Logger } from 'winston';
 import path from 'path';
+import dotenv from 'dotenv';
 
 const ENTITY_APPLICATION_TABLE = 'entity-application-mapping';
 const OAUTH_MAPPING_TABLE = 'oauth-mapping';
 
-console.log('Resolving path for migrations...');
-//TODO: Local dev broken with this change...
-const pluginRoot =
-  process.env.PLUGIN_ROOT ||
-  '/opt/app-root/src/dynamic-plugins-root/internal-backstage-plugin-mta-backend-dynamic-0.1.0';
-console.log(`what is process.env here? ${process.env}`);
+// Load environment variables
+dotenv.config();
 
+// Define default plugin root path using APP_ROOT if available
+const defaultPluginRoot = path.join(
+  process.env.APP_ROOT || '/opt/app-root', // Fallback to a hardcoded default if APP_ROOT is not set
+  'src',
+  'dynamic-plugins-root',
+  'internal-backstage-plugin-mta-backend-dynamic-0.1.0',
+);
+
+// Check if running in development environment
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Determine the plugin root directory based on environment
+const pluginRoot = isDevelopment
+  ? resolvePackagePath('@internal/backstage-plugin-mta-backend')
+  : process.env.PLUGIN_ROOT || defaultPluginRoot;
+
+console.log('Resolving path for migrations...');
 const migrationsDir = path.join(pluginRoot, 'migrations');
 console.log(`Using plugin root directory: ${pluginRoot}`);
 console.log(`Migrations directory resolved to: ${migrationsDir}`);
-
-// const migrationsDir = resolvePackagePath(
-//   '@internal/backstage-plugin-mta-backend',
-//   'migrations',
-// );
-
-console.log('Migrations directory resolved to:', migrationsDir);
 
 export interface EntityApplicationStorage {
   getAllEntities(): Promise<any[]>;
