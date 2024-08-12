@@ -12,6 +12,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "dist-types",
-    "rootDir": "."
+    "rootDir": ".",
+    "moduleResolution": "node",
+    "baseUrl": "./"
   }
 }
