@@ -3,6 +3,23 @@ import {
   IdentityApi,
   createApiRef,
 } from '@backstage/core-plugin-api';
+export class AuthenticationError extends Error {
+  public loginUrl: string;
+
+  constructor(loginUrl: string) {
+    window.location.href = loginUrl;
+    super(`Authentication required at ${loginUrl}`);
+    this.name = 'AuthenticationError';
+    this.loginUrl = loginUrl;
+  }
+}
+
+export class APIError extends Error {
+  constructor(message: string, public statusCode: number) {
+    super(message);
+    this.name = 'APIError';
+  }
+}
 export interface Metadata {
   target: string;
   source?: string;
@@ -89,14 +106,11 @@ export type Application = {
   };
 };
 export interface MTAApi {
-  getApplications(): Promise<Application[] | URL>;
-  getApplication(entityID: string): Promise<Application | URL | null>;
-  getTargets(): Promise<Target[] | URL>;
-  getAllEntities(): Promise<any[]>;
+  getTargets(): Promise<Target[]>;
   analyzeMTAApplications(
     applicationId: string,
     analysisOptions: any,
-  ): Promise<any | URL>;
+  ): Promise<any>;
 }
 
 export const mtaApiRef = createApiRef<MTAApi>({
@@ -107,36 +121,7 @@ export class DefaultMtaApi implements MTAApi {
   private readonly discoveryApi: DiscoveryApi;
   private readonly identityApi: IdentityApi;
 
-  async getAllEntities(): Promise<any[]> {
-    const url = await this.discoveryApi.getBaseUrl('mta');
-    const { token: idToken } = await this.identityApi.getCredentials();
-
-    const response = await fetch(`${url}/entities`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(idToken && { Authorization: `Bearer ${idToken}` }),
-      },
-      referrerPolicy: 'no-referrer-when-downgrade',
-    });
-
-    if (response.status === 401) {
-      const j = await response.json();
-      throw new Error(j.loginURL);
-      // return new URL(j.loginURL);
-    }
-
-    if (!response.ok) {
-      const message = `Request failed with status ${
-        response.status
-      }: ${await response.text()}`;
-      throw new Error(message);
-    }
-
-    return await response.json();
-  }
-
-  async getTargets(): Promise<Target[] | URL> {
+  async getTargets(): Promise<Target[]> {
     const url = await this.discoveryApi.getBaseUrl('mta');
     const { token: idToken } = await this.identityApi.getCredentials();
 
@@ -152,72 +137,16 @@ export class DefaultMtaApi implements MTAApi {
 
     if (response.status === 401) {
       const j = await response.json();
-      return new URL(j.loginURL);
+      throw new AuthenticationError(j.loginURL);
     }
 
     if (!response.ok) {
-      const message = `Request failed with status ${
-        response.status
-      }: ${await response.text()}`;
-      throw new Error(message);
-    }
-
-    return await response.json();
-  }
-  async getApplications(): Promise<Application[] | URL> {
-    const url = await this.discoveryApi.getBaseUrl('mta');
-    const { token: idToken } = await this.identityApi.getCredentials();
-
-    const response = await fetch(`${url}/applications`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(idToken && { Authorization: `Bearer ${idToken}` }),
-      },
-      referrerPolicy: 'no-referrer-when-downgrade',
-      redirect: 'error',
-    });
-
-    if (response.status === 401) {
-      const j = await response.json();
-      return new URL(j.loginURL); // Redirect for login
-    }
-
-    if (!response.ok) {
-      const message = `Request failed with status ${
-        response.status
-      }: ${await response.text()}`;
-      throw new Error(message);
-    }
-
-    return await response.json(); // Success case
-  }
-
-  async getApplication(entityID: String): Promise<Application | URL | null> {
-    const url = await this.discoveryApi.getBaseUrl('mta');
-    const { token: idToken } = await this.identityApi.getCredentials();
-
-    const response = await fetch(`${url}/application/entity/${entityID}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(idToken && { Authorization: `Bearer ${idToken}` }),
-      },
-      referrerPolicy: 'no-referrer-when-downgrade',
-    });
-
-    if (response.status === 404) {
-      return null;
-    }
-    if (response.status === 401) {
-      const j = await response.json();
-      return new URL(j.loginURL);
-    }
-    if (!response.ok) {
-      const message = `Request failed with status ${
-        response.status
-      }: ${await response.text()}`;
-      throw new Error(message);
+      throw new APIError(
+        `Request failed with status ${
+          response.status
+        }: ${await response.text()}`,
+        response.status,
+      );
     }
 
     return await response.json();
@@ -226,7 +155,7 @@ export class DefaultMtaApi implements MTAApi {
   async analyzeMTAApplications(
     applicationId: string,
     analysisOptions: any,
-  ): Promise<Application | URL> {
+  ): Promise<Application> {
     const url = await this.discoveryApi.getBaseUrl('mta');
     const { token: idToken } = await this.identityApi.getCredentials();
 
@@ -238,21 +167,23 @@ export class DefaultMtaApi implements MTAApi {
           'Content-Type': 'application/json',
           ...(idToken && { Authorization: `Bearer ${idToken}` }),
         },
-        body: JSON.stringify(analysisOptions), // Make sure analysisOptions is in the correct format expected by the API
+        body: JSON.stringify(analysisOptions),
         referrerPolicy: 'no-referrer-when-downgrade',
       },
     );
 
     if (response.status === 401) {
       const jsonResponse = await response.json();
-      return new URL(jsonResponse.loginURL); // Assuming the server redirects to a login URL if not authenticated
+      throw new AuthenticationError(jsonResponse.loginURL);
     }
 
     if (!response.ok) {
-      const errorMessage = `Request failed with status ${
-        response.status
-      }: ${await response.text()}`;
-      throw new Error(errorMessage);
+      throw new APIError(
+        `Request failed with status ${
+          response.status
+        }: ${await response.text()}`,
+        response.status,
+      );
     }
 
     return await response.json();
