@@ -1,13 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: dynamic-plugins-getting-started
-  description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
+  name: backstage-mta-plugins
+  description: A collection of backstage plugins for MTA. 
 spec:
   type: website
-  owner: john@example.com
+  owner: ibolton@redhat.com
   lifecycle: experimental

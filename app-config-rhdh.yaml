@@ -62,7 +62,7 @@ data:
         - allow: [Component, System, API, Resource, Location]
       locations:
         - type: url 
-          target: https://github.com/ibolton336/dynamic-plugins-getting-started/blob/main/create-application-template.yaml
+          target: https://github.com/ibolton336/backstage-mta-plugins/blob/main/create-application-template.yaml
           rules:
             - allow: [Template]
 
