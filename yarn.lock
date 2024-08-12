@@ -6848,7 +6848,7 @@ __metadata:
     "@material-ui/icons": ^4.11.3
     "@material-ui/lab": 4.0.0-alpha.61
     "@mui/icons-material": ^5.15.9
-    "@tanstack/react-query": ^5.40.0
+    "@tanstack/react-query": ^5.51.23
     "@tanstack/react-query-devtools": ^5.45.1
     "@testing-library/jest-dom": ^5.10.1
     "@testing-library/react": ^12.1.3
@@ -12096,7 +12096,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.40.0":
+"@tanstack/react-query@npm:^5.51.23":
   version: 5.51.23
   resolution: "@tanstack/react-query@npm:5.51.23"
   dependencies:
