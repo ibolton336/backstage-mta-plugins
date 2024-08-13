@@ -45,6 +45,7 @@ ls -l $DYNAMIC_PLUGIN_ROOT_DIR
 
 # Step 6: Recreate namespace
 oc create ns local-backstage
+oc project local-backstage
 
 # Step 7: Create the dynamic-plugins-rhdh ConfigMap
 cat <<EOF | oc apply -f -

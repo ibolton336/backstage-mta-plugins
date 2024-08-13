@@ -50,7 +50,7 @@ These plugins are designed to work in unison to provide a means to create and an
     ```
     oc get routes
     ```
-    You will need the URL for the tackle instance to configure the MTA plugin. This URL needs to be added to the app-config configmap [here](app-config-rhdh.example.yaml)under the `mta` key. Be sure to add the `http://` or `https://` prefix to the URL.
+    You will need the URL for the tackle instance to configure the MTA plugin. This URL needs to be added to the app-config configmap [here](app-config-rhdh.example.yaml) under the `mta` key. Be sure to add the `http://` or `https://` prefix to the URL.
 
 - Additionally, The MTA plugin requires a keycloak instance to authenticate with the MTA instance. This can be created and configured simply by running the [Tackle create keycloak script](tackle-create-keycloak-client.sh) or the [MTA create keycloak script](mta-create-keycloak-client.sh). This will create a keycloak client for the MTA instance and provide the necessary configuration for the MTA plugin. The keycloak configuration also needs to be added to the app-config configmap [here](app-config-rhdh.example.yaml) under the `mta` key.
 
@@ -59,7 +59,7 @@ These plugins are designed to work in unison to provide a means to create and an
  
 
 ### RHDH Operator
-- To begin setting up the RHDH operator for local development, you will need to clone the repository from [here](https://github.com/redhat-developer/rhdh-operator) and follow the instructions in the README.md file. This will allow you to deploy the RHDH operator to your local cluster. An example of the backstage CR can be found (here)[./backstage-operator-cr.yaml]. Note the referenced configmaps in the CR, as they will be needed for the plugins to function correctly.
+- To begin setting up the RHDH operator for local development, you will need to clone the repository from [here](https://github.com/redhat-developer/rhdh-operator) and follow the instructions in the README.md file. This will allow you to deploy the RHDH operator to your local cluster. You will need to run `make deploy` after cloning the repo from the project root. This will ensure all CRDs are installed first. Then you will need to create the backstage rhdh CR. An example of the backstage CR can be found [here](./backstage-operator-cr.yaml). Note the referenced configmaps in the CR, as they will be needed for the plugins to function correctly.
 
 ### Configmaps and Secrets
 
