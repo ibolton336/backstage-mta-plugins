@@ -25,7 +25,7 @@ interface IFormInput {
 }
 
 export const AnalysisPage = () => {
-  const { control, handleSubmit } = useForm<IFormInput>({
+  const { control, handleSubmit, watch } = useForm<IFormInput>({
     defaultValues: {
       type: '',
       targetList: [],
@@ -72,6 +72,15 @@ export const AnalysisPage = () => {
       )
     : [];
 
+  const [type, targetList, sourceCredentials, mavenCredentials] = watch([
+    'type',
+    'targetList',
+    'sourceCredentials',
+    'mavenCredentials',
+  ]);
+  const enableAnalysis =
+    type && targetList.length > 0 && sourceCredentials && mavenCredentials;
+
   const onSubmit = (data: IFormInput) => {
     setIsAnalyzing(true);
     const app = entity.entity.metadata.application as unknown as Application;
@@ -103,9 +112,9 @@ export const AnalysisPage = () => {
                 label="Type"
                 // onChange={e => setValue('type', e.target.value)}
               >
-                {['Source', 'Source + Dependencies'].map(type => (
-                  <MenuItem key={type} value={type}>
-                    {type}
+                {['Source', 'Source + Dependencies'].map(option => (
+                  <MenuItem key={option} value={option}>
+                    {option}
                   </MenuItem>
                 ))}
               </Select>
@@ -175,7 +184,12 @@ export const AnalysisPage = () => {
           />
         </FormControl>
 
-        <Button type="submit" variant="contained" style={{ marginTop: '15px' }}>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={!enableAnalysis}
+          style={{ marginTop: '15px' }}
+        >
           Analyze
         </Button>
       </form>
