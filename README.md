@@ -50,9 +50,9 @@ These plugins are designed to work in unison to provide a means to create and an
     ```
     oc get routes
     ```
-    You will need the URL for the tackle instance to configure the MTA plugin. This URL needs to be added to the app-config configmap [here](app-config-rhdh.yaml)under the `mta` key. Be sure to add the `http://` or `https://` prefix to the URL.
+    You will need the URL for the tackle instance to configure the MTA plugin. This URL needs to be added to the app-config configmap [here](app-config-rhdh.example.yaml)under the `mta` key. Be sure to add the `http://` or `https://` prefix to the URL.
 
-- Additionally, The MTA plugin requires a keycloak instance to authenticate with the MTA instance. This can be created and configured simply by running the [Tackle create keycloak script](tackle-create-keycloak-client.sh) or the [MTA create keycloak script](mta-create-keycloak-client.sh). This will create a keycloak client for the MTA instance and provide the necessary configuration for the MTA plugin. The keycloak configuration also needs to be added to the app-config configmap [here](app-config-rhdh.yaml) under the `mta` key.
+- Additionally, The MTA plugin requires a keycloak instance to authenticate with the MTA instance. This can be created and configured simply by running the [Tackle create keycloak script](tackle-create-keycloak-client.sh) or the [MTA create keycloak script](mta-create-keycloak-client.sh). This will create a keycloak client for the MTA instance and provide the necessary configuration for the MTA plugin. The keycloak configuration also needs to be added to the app-config configmap [here](app-config-rhdh.example.yaml) under the `mta` key.
 
 
 
@@ -64,7 +64,7 @@ These plugins are designed to work in unison to provide a means to create and an
 ### Configmaps and Secrets
 
 - Two primary configmaps are required to get the MTA plugin loaded as a dynamic plugin within RHDH: 
-    - [App config](app-config-rhdh.yaml)
+    - [App config](app-config-rhdh.example.yaml) - Rename this file to app-config-rhdh.yaml and update the values as needed. This configmap contains the configuration for the backstage instance. The keys are as follows:
         - `mta` - Contains the configuration for the MTA resources.
             - `url` - The URL for the MTA instance running in the cluster.
             - `providerAuth` - The keycloak authentication configuration for the MTA instance. 
