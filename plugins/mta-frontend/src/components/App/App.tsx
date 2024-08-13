@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Grid } from '@material-ui/core';
+import { Divider, Grid, Typography } from '@material-ui/core';
 import {
   Header,
   Page,
@@ -23,13 +23,21 @@ const queryClient = new QueryClient({
 export const App = () => (
   <QueryClientProvider client={queryClient}>
     <Page themeId="tool">
-      <Header title="Application Moderinization and Migration Info" />
+      <Header title="Application Modernization and Migration Info" />
       <Content>
         <ContentHeader title="MTA Quick Overview">
-          <SupportButton>A description of your plugin goes here.</SupportButton>
+          <SupportButton>
+            A comprehensive view of the MTA workflow integrated within RHDH.
+          </SupportButton>
         </ContentHeader>
-        <Divider style={{ margin: '2em 0' }} /> {/* Adjust margin as needed */}
-        <Grid container spacing={3} direction="column">
+        <Divider style={{ margin: '20px 0' }} />
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          alignItems="center"
+          style={{ width: '100%' }}
+        >
           <MTAApplicationManager />
         </Grid>
       </Content>

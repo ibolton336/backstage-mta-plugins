@@ -1,15 +1,37 @@
 import React from 'react';
-import { Grid, Tab, Tabs, Box, Typography } from '@material-ui/core';
-import { ResponseErrorPanel } from '@backstage/core-components';
+import { Grid, Tab, Tabs, makeStyles } from '@material-ui/core';
+import { LinkButton, ResponseErrorPanel } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { AppCard } from '../AppCard/AppCard';
 import { AnalysisPage } from '../AnalysisPage/AnalysisPage';
+import { Application } from '../../api/api';
+import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1, // Ensures the container takes full height
+    width: '100%', // Ensures the container takes full width
+  },
+  tabPanel: {
+    display: 'block', // Ensures the tab panel is always visible when selected
+    width: '100%', // Ensures the tab panel takes full width
+    minHeight: 500, // Adjust this value based on your content needs
+    flex: '1 0 auto', // Prevents flex items from shrinking
+  },
+  tabBar: {
+    borderBottom: '1px solid ' + theme.palette.divider,
+    marginBottom: theme.spacing(2),
+  },
+}));
 
 export const MTAApplicationManager = () => {
+  const classes = useStyles();
   const entity = useEntity();
+  const application = entity?.entity?.metadata
+    .application as unknown as Application;
   const [tab, setTab] = React.useState(0);
 
-  const handleTabChange = (newValue: number) => {
+  const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
 
@@ -25,37 +47,36 @@ export const MTAApplicationManager = () => {
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      {/* Display the application name and some details */}
-      <Typography variant="h5" gutterBottom>
-        Application Name: {entity.entity.metadata.name}
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        Unique ID: {entity.entity.metadata.uid}
-      </Typography>
-
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 10 }}>
+    <Grid container direction="column" className={classes.root}>
+      <ApplicationDetailsHeader application={application} />
+      <Grid item xs={12} className={classes.tabBar}>
         <Tabs
+          variant="fullWidth"
           value={tab}
-          onChange={(_, val) => handleTabChange(val)}
-          aria-label="Application tabs"
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          aria-label="application tabs"
         >
           <Tab label="Application Details" />
           <Tab label="Analysis" />
-          {/* <Tab label="Effort" /> */}
         </Tabs>
-      </Box>
-
-      {/* Conditional rendering of tab panels */}
-      <Grid item xs={12} role="tabpanel" hidden={tab !== 0} id="tabpanel-0">
-        <AppCard />
+        {tab === 0 && <AppCard />}
+        {tab === 1 && <AnalysisPage />}
       </Grid>
-      <Grid item xs={12} role="tabpanel" hidden={tab !== 1} id="tabpanel-1">
-        <AnalysisPage />
-      </Grid>
-      {/* <Grid item xs={12} role="tabpanel" hidden={tab !== 1} id={`tabpanel-1`}>
-        </>
-      </Grid> */}
-    </Box>
+      {/* {tab === 0 && (
+        <Grid item xs={12} className={classes.tabPanel} role="tabpanel">
+          <AppCard />
+        </Grid>
+      )}
+      {tab === 1 && (
+        <Grid item xs={12} className={classes.tabPanel} role="tabpanel">
+          <AnalysisPage />
+        </Grid>
+      )} */}
+      {/* <Grid item xs={12} key={tab}></Grid> */}
+    </Grid>
   );
 };
+
+export default MTAApplicationManager;

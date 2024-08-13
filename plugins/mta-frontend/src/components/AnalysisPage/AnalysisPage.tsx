@@ -1,12 +1,13 @@
 import React from 'react';
 import {
-  Box,
   Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   CircularProgress,
+  Grid,
+  Typography,
 } from '@material-ui/core';
 import { useForm, Controller, Form } from 'react-hook-form';
 import {
@@ -99,106 +100,117 @@ export const AnalysisPage = () => {
     }, 2000); // Simulates 2 seconds of analysis
   };
   return (
-    <Box sx={{ width: '100%', padding: 4 }}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Type</InputLabel>
-          <Controller
-            name="type"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                label="Type"
-                // onChange={e => setValue('type', e.target.value)}
-              >
-                {['Source', 'Source + Dependencies'].map(option => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Target List</InputLabel>
-          <Controller
-            name="targetList"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                label="Target List"
-                multiple
-                // onChange={e => setValue('targetList', e.target.value)}
-                // renderValue={selected => selected.join(', ')}
-              >
-                {labelOptions.map(label => (
-                  <MenuItem key={label?.label} value={label?.label}>
-                    {label?.name || ''}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Source credentials</InputLabel>
-          <Controller
-            name="sourceCredentials"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                label="Source credentials"
-                // onChange={e => setValue('type', e.target.value)}
-              >
-                {sourceIdentityOptions?.map(option => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.toString()}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </FormControl>
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Maven credentials</InputLabel>
-          <Controller
-            name="mavenCredentials"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                label="Maven credentials"
-                // onChange={e => setValue('type', e.target.value)}
-              >
-                {mavenIdentityOptions?.map(option => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.toString()}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </FormControl>
+    <Grid
+      container
+      spacing={2}
+      justifyContent="center"
+      style={{ marginTop: '2vh', minHeight: '100vh' }}
+    >
+      <Grid item xs={12} md={6}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Type</InputLabel>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label="Type"
+                  // onChange={e => setValue('type', e.target.value)}
+                >
+                  {['Source', 'Source + Dependencies'].map(option => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Target List</InputLabel>
+            <Controller
+              name="targetList"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label="Target List"
+                  multiple
+                  // onChange={e => setValue('targetList', e.target.value)}
+                  // renderValue={selected => selected.join(', ')}
+                >
+                  {labelOptions.map(label => (
+                    <MenuItem key={label?.label} value={label?.label}>
+                      {label?.name || ''}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Source credentials</InputLabel>
+            <Controller
+              name="sourceCredentials"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label="Source credentials"
+                  // onChange={e => setValue('type', e.target.value)}
+                >
+                  {sourceIdentityOptions?.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.toString()}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Maven credentials</InputLabel>
+            <Controller
+              name="mavenCredentials"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label="Maven credentials"
+                  // onChange={e => setValue('type', e.target.value)}
+                >
+                  {mavenIdentityOptions?.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.toString()}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
 
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={!enableAnalysis}
-          style={{ marginTop: '15px' }}
-        >
-          Analyze
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!enableAnalysis}
+            style={{ marginTop: '15px' }}
+          >
+            Analyze
+          </Button>
+        </form>
+      </Grid>
       {isAnalyzing && (
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+        <Grid
+          item
+          xs={12}
+          // sx={{ display: 'flex', alignItems: 'center', mt: 2 }}
+        >
           <CircularProgress />
-          <Box sx={{ ml: 2 }}>Analyzing...</Box>
-        </Box>
+          <Typography>Analyzing...</Typography>
+        </Grid>
       )}
-    </Box>
+    </Grid>
   );
 };

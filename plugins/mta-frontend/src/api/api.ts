@@ -125,6 +125,7 @@ export type Application = {
     id: string;
     name: string;
   };
+  repository?: Repository;
 };
 export interface MTAApi {
   getTargets(): Promise<Target[]>;
