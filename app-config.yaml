@@ -31,7 +31,7 @@ backend:
   database:
     client: better-sqlite3
     connection: ':memory:'
-    # connection: 
+    # connection:
     #   directory: /tmp/backstage-backend
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
@@ -43,10 +43,10 @@ backend:
 #     clientID: backstage-provider
 
 mta:
-  url: https://tackle-konveyor-tackle.ibolton-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
+  url: https://tackle-konveyor-tackle.ibolton2-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
   providerAuth:
     # realm: mta
-    realm: tackle 
+    realm: tackle
     secret: backstage-provider-secret
     clientID: backstage-provider
 
@@ -59,7 +59,7 @@ techdocs:
 
 auth:
   providers:
-    guest: {} 
+    guest: {}
 
   environment: development
 
@@ -73,7 +73,6 @@ catalog:
   locations:
     - type: file
       target: ../../examples/entities.yaml
-
 
     - type: file
       target: ../../examples/template/create-application-template.yaml

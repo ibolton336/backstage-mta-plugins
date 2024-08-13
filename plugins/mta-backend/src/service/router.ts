@@ -235,6 +235,26 @@ export async function createRouter(
     response.json(j);
   });
 
+  router.get('/identities', async (_, response) => {
+    const getResponse = fetch(`${baseURLHub}/identities`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+        Authorization: `Bearer ${response.locals.accessToken}`,
+      },
+      method: 'GET',
+    });
+
+    const status = await (await getResponse).status;
+    if (status !== 200) {
+      response.status(status);
+      response.json({ status: status });
+      return;
+    }
+    const j = await (await getResponse).json();
+    response.json(j);
+  });
+
   router.get('/applications', async (_, response) => {
     const getResponse = fetch(`${baseURLHub}/applications`, {
       credentials: 'include',

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { mtaApiRef, Target } from '../api/api';
+import { Identity, mtaApiRef, Target } from '../api/api';
 import { useApi } from '@backstage/core-plugin-api';
 
 export const TargetsQueryKey = 'targets';
@@ -58,4 +58,19 @@ export const useAnalyzeApplication = (
   });
 
   return mutation;
+};
+
+export const useFetchIdentities = () => {
+  const api = useApi(mtaApiRef);
+  const { isLoading, error, data, isError } = useQuery<Identity[]>({
+    queryKey: ['credentials'],
+    queryFn: () => api.getIdentities(),
+  });
+
+  return {
+    identities: data,
+    isFetching: isLoading,
+    fetchError: error,
+    isError: isError,
+  };
 };

@@ -3,6 +3,7 @@ import {
   IdentityApi,
   createApiRef,
 } from '@backstage/core-plugin-api';
+
 export class AuthenticationError extends Error {
   public loginUrl: string;
 
@@ -87,6 +88,26 @@ export interface Target {
   ruleset: Ruleset;
   provider?: string;
 }
+export type IdentityKind =
+  | 'source'
+  | 'maven'
+  | 'proxy'
+  | 'basic-auth'
+  | 'bearer';
+
+export interface Identity {
+  id: number;
+  createUser?: string;
+  updateUser?: string;
+  createTime?: string;
+  kind: IdentityKind;
+  name: string;
+  description?: string;
+  user?: string;
+  password?: string;
+  key?: string;
+  settings?: string;
+}
 
 export type Application = {
   id: string;
@@ -107,6 +128,7 @@ export type Application = {
 };
 export interface MTAApi {
   getTargets(): Promise<Target[]>;
+  getIdentities(): Promise<Identity[]>;
   analyzeMTAApplications(
     applicationId: string,
     analysisOptions: any,
@@ -120,6 +142,37 @@ export const mtaApiRef = createApiRef<MTAApi>({
 export class DefaultMtaApi implements MTAApi {
   private readonly discoveryApi: DiscoveryApi;
   private readonly identityApi: IdentityApi;
+
+  async getIdentities(): Promise<Identity[]> {
+    const url = await this.discoveryApi.getBaseUrl('mta');
+    const { token: idToken } = await this.identityApi.getCredentials();
+
+    const response = await fetch(`${url}/identities`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(idToken && { Authorization: `Bearer ${idToken}` }),
+      },
+      referrerPolicy: 'no-referrer-when-downgrade',
+      redirect: 'error',
+    });
+
+    if (response.status === 401) {
+      const j = await response.json();
+      throw new AuthenticationError(j.loginURL);
+    }
+
+    if (!response.ok) {
+      throw new APIError(
+        `Request failed with status ${
+          response.status
+        }: ${await response.text()}`,
+        response.status,
+      );
+    }
+
+    return await response.json();
+  }
 
   async getTargets(): Promise<Target[]> {
     const url = await this.discoveryApi.getBaseUrl('mta');

@@ -8,14 +8,20 @@ import {
   Select,
   CircularProgress,
 } from '@material-ui/core';
-import { useForm, Controller } from 'react-hook-form';
-import { useFetchTargets, useAnalyzeApplication } from '../../queries/mta';
+import { useForm, Controller, Form } from 'react-hook-form';
+import {
+  useFetchTargets,
+  useAnalyzeApplication,
+  useFetchIdentities,
+} from '../../queries/mta';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Application } from '../../api/api';
 
 interface IFormInput {
   type: string;
   targetList: string[];
+  sourceCredentials?: string;
+  mavenCredentials?: string;
 }
 
 export const AnalysisPage = () => {
@@ -29,9 +35,34 @@ export const AnalysisPage = () => {
   const entity = useEntity();
 
   const { targets } = useFetchTargets();
+  const { identities } = useFetchIdentities();
+
   const { mutate: analyzeApp } = useAnalyzeApplication({});
 
-  // Flatten the labels into a single array of options
+  const sourceIdentityOptions = identities
+    ? [
+        ...identities
+          .filter(identity => identity.kind === 'source')
+          .map(sourceIdentity => ({
+            value: sourceIdentity.name,
+            toString: () => sourceIdentity.name,
+          })),
+        { value: 'none', toString: () => 'None' }, // Adding the 'None' option
+      ]
+    : [{ value: 'none', toString: () => 'None' }];
+
+  const mavenIdentityOptions = identities
+    ? [
+        ...identities
+          .filter(identity => identity.kind === 'maven')
+          .map(maven => ({
+            value: maven.name,
+            toString: () => maven.name,
+          })),
+        { value: 'none', toString: () => 'None' }, // Adding the 'None' option
+      ]
+    : [{ value: 'none', toString: () => 'None' }];
+
   const labelOptions = targets
     ? targets?.flatMap(target =>
         target?.labels?.map(label => ({
@@ -45,7 +76,7 @@ export const AnalysisPage = () => {
     setIsAnalyzing(true);
     const app = entity.entity.metadata.application as unknown as Application;
     const analysisParams = {
-      selectedApp: app.id, // Assuming 'applications' is an array of objects
+      selectedApp: app.id,
       analysisOptions: {
         type: data.type,
         targetList: data.targetList,
@@ -103,6 +134,47 @@ export const AnalysisPage = () => {
             )}
           />
         </FormControl>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Source credentials</InputLabel>
+          <Controller
+            name="sourceCredentials"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                label="Source credentials"
+                // onChange={e => setValue('type', e.target.value)}
+              >
+                {sourceIdentityOptions?.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.toString()}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+        </FormControl>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Maven credentials</InputLabel>
+          <Controller
+            name="mavenCredentials"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                label="Maven credentials"
+                // onChange={e => setValue('type', e.target.value)}
+              >
+                {mavenIdentityOptions?.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.toString()}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+        </FormControl>
+
         <Button type="submit" variant="contained" style={{ marginTop: '15px' }}>
           Analyze
         </Button>
