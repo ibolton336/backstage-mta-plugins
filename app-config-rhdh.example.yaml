@@ -11,18 +11,18 @@ data:
   app-config-rhdh.yaml: |-
     app:
       title: Red Hat Developer Hub - Migration Toolkit for Applications
-      baseUrl: https://backstage-developer-hub-local-backstage.ibolton-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
+      baseUrl: <BACKSTAGE_URL>
     backend:
-      baseUrl: https://backstage-developer-hub-local-backstage.ibolton-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
+      baseUrl: <BACKSTAGE_URL>
       cors:
-        origin: https://backstage-developer-hub-local-backstage.ibolton-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
+        origin: <BACKSTAGE_URL>
         methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
         credentials: true
       auth:
         dangerouslyDisableDefaultAuthPolicy: true
 
     mta:
-      url: https://tackle-konveyor-tackle.ibolton2-3626522b15eedb880d7b99992e225c1b-0000.us-east.containers.appdomain.cloud
+      url: <MTA_URL>
       providerAuth:
         realm: tackle 
         secret: backstage-provider-secret
