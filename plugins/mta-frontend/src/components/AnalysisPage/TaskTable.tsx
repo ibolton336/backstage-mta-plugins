@@ -50,6 +50,10 @@ const TaskTable = ({ tasks, isFetching }: ITaskTableProps) => {
   const annotations = entity?.entity?.metadata?.annotations || {};
   const mtaUrl = annotations['mta-url'] || '';
 
+  const isValidDate = date => {
+    return date instanceof Date && !isNaN(date.getTime());
+  };
+
   if (isFetching && !tasks) {
     return <div>Loading...</div>;
   }
@@ -80,9 +84,15 @@ const TaskTable = ({ tasks, isFetching }: ITaskTableProps) => {
                   <Typography>{task.state}</Typography>
                 </div>
               </TableCell>
-              <TableCell>{new Date(task.started).toLocaleString()}</TableCell>
               <TableCell>
-                {new Date(task.terminated).toLocaleString()}
+                {isValidDate(new Date(task.started))
+                  ? new Date(task.started).toLocaleString()
+                  : 'N/A'}
+              </TableCell>
+              <TableCell>
+                {isValidDate(new Date(task.terminated))
+                  ? new Date(task.terminated).toLocaleString()
+                  : 'N/A'}
               </TableCell>
               <TableCell>
                 <Link href={`${mtaUrl}/tasks/${task.id}`} target="_blank_">
