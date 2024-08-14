@@ -367,7 +367,7 @@ export async function createRouter(
 
     const status = await (await getResponse).status;
     if (status !== 200) {
-      logger.error('resposne does not make sense %s', getResponse);
+      logger.error('response does not make sense %s', getResponse);
       response.status(status);
       response.json({ status: status });
       return;
@@ -375,6 +375,43 @@ export async function createRouter(
     const j = await (await getResponse).json();
     response.json(j);
   });
+
+  router.put('/applications/:id', async (req, res) => {
+    const applicationId = req.params.id;
+    const accessToken = res.locals.accessToken; // Assuming accessToken is correctly set in locals
+    const url = `${baseURLHub}/applications/${applicationId}`;
+
+    try {
+      const fetchResponse = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/json', // Ensure you have Content-Type set for JSON body
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(req.body),
+        credentials: 'include',
+      });
+
+      if (!fetchResponse.ok) {
+        // Check if the HTTP response status code is 2xx
+        const errorText = await fetchResponse.text(); // Getting full error message from the server
+        console.error('Failed to update application:', errorText);
+        return res.status(fetchResponse.status).json({ error: errorText });
+      }
+      if (fetchResponse.status === 204) {
+        res.status(204).json({ message: 'No Content' });
+        return res;
+      }
+      // const jsonResponse = await fetchResponse.json(); // Assuming the successful response is JSON
+      // res.json(jsonResponse);
+    } catch (error) {
+      console.error('Error updating application:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  module.exports = router;
 
   router.post(
     '/analyze-application/:applicationId',
@@ -423,27 +460,6 @@ export async function createRouter(
         kind: 'analyzer',
       };
 
-      // const createTaskgroup = async (obj: Taskgroup) => {
-      //   const createTaskgroupResponse = await fetch(TASKGROUPS, {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       Authorization: `Bearer ${response.locals.access_token}`,
-      //     },
-      //     body: JSON.stringify(obj),
-      //   });
-
-      //   if (!createTaskgroupResponse.ok) {
-      //     const errorText = await createTaskgroupResponse.text();
-      //     logger.info(
-      //       `Unable to call hub, status: ${response.status}, message: ${errorText}`,
-      //     );
-      //     throw new Error(
-      //       `HTTP error! status: ${response.status}, body: ${errorText}`,
-      //     );
-      //   }
-      //   return await createTaskgroupResponse.json();
-      // };
       const createTaskgroup = async (obj: Taskgroup) => {
         console.log('obj', obj);
         const createTaskgroupResponse = await fetch(TASKGROUPS, {

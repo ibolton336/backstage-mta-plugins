@@ -126,6 +126,7 @@ export type Application = {
     name: string;
   };
   repository?: Repository;
+  identities?: Ref[];
 };
 export interface MTAApi {
   getTargets(): Promise<Target[]>;
@@ -134,6 +135,7 @@ export interface MTAApi {
     applicationId: string,
     analysisOptions: any,
   ): Promise<any>;
+  updateApplication(application: Application): Promise<Application>;
 }
 
 export const mtaApiRef = createApiRef<MTAApi>({
@@ -143,6 +145,37 @@ export const mtaApiRef = createApiRef<MTAApi>({
 export class DefaultMtaApi implements MTAApi {
   private readonly discoveryApi: DiscoveryApi;
   private readonly identityApi: IdentityApi;
+
+  async updateApplication(application: Application): Promise<Application> {
+    const url = await this.discoveryApi.getBaseUrl('mta');
+    const { token: idToken } = await this.identityApi.getCredentials();
+
+    const response = await fetch(`${url}/applications/${application.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(idToken && { Authorization: `Bearer ${idToken}` }),
+      },
+      body: JSON.stringify(application),
+      referrerPolicy: 'no-referrer-when-downgrade',
+    });
+
+    if (response.status === 401) {
+      const j = await response.json();
+      throw new AuthenticationError(j.loginURL);
+    }
+
+    if (!response.ok) {
+      throw new APIError(
+        `Request failed with status ${
+          response.status
+        }: ${await response.text()}`,
+        response.status,
+      );
+    }
+
+    return await response.json();
+  }
 
   async getIdentities(): Promise<Identity[]> {
     const url = await this.discoveryApi.getBaseUrl('mta');

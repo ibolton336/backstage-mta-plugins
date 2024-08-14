@@ -1,8 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Identity, mtaApiRef, Target } from '../api/api';
+import { Application, Identity, mtaApiRef, Target } from '../api/api';
 import { useApi } from '@backstage/core-plugin-api';
 
 export const TargetsQueryKey = 'targets';
+
+export const useUpdateApplication = () => {
+  const api = useApi(mtaApiRef);
+  const queryClient = useQueryClient();
+
+  const updateApplication = async (application: Application) => {
+    return await api.updateApplication(application);
+  };
+
+  const mutation = useMutation<any, Error, any>({
+    mutationFn: updateApplication,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+  });
+
+  return mutation;
+};
 
 export const useFetchTargets = () => {
   const api = useApi(mtaApiRef);
@@ -59,12 +77,16 @@ export const useAnalyzeApplication = (
 
   return mutation;
 };
-
 export const useFetchIdentities = () => {
   const api = useApi(mtaApiRef);
-  const { isLoading, error, data, isError } = useQuery<Identity[]>({
+  const { isLoading, error, data, isError, refetch } = useQuery<Identity[]>({
     queryKey: ['credentials'],
     queryFn: () => api.getIdentities(),
+    select: identityData => [
+      { id: 999999, name: 'None', kind: 'source' },
+      { id: 9999999, name: 'None', kind: 'maven' },
+      ...identityData,
+    ],
   });
 
   return {
@@ -72,5 +94,6 @@ export const useFetchIdentities = () => {
     isFetching: isLoading,
     fetchError: error,
     isError: isError,
+    refetch,
   };
 };

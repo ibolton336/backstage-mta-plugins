@@ -40,30 +40,6 @@ export const AnalysisPage = () => {
 
   const { mutate: analyzeApp } = useAnalyzeApplication({});
 
-  const sourceIdentityOptions = identities
-    ? [
-        ...identities
-          .filter(identity => identity.kind === 'source')
-          .map(sourceIdentity => ({
-            value: sourceIdentity.name,
-            toString: () => sourceIdentity.name,
-          })),
-        { value: 'none', toString: () => 'None' }, // Adding the 'None' option
-      ]
-    : [{ value: 'none', toString: () => 'None' }];
-
-  const mavenIdentityOptions = identities
-    ? [
-        ...identities
-          .filter(identity => identity.kind === 'maven')
-          .map(maven => ({
-            value: maven.name,
-            toString: () => maven.name,
-          })),
-        { value: 'none', toString: () => 'None' }, // Adding the 'None' option
-      ]
-    : [{ value: 'none', toString: () => 'None' }];
-
   const labelOptions = targets
     ? targets?.flatMap(target =>
         target?.labels?.map(label => ({
@@ -144,46 +120,6 @@ export const AnalysisPage = () => {
                   {labelOptions.map(label => (
                     <MenuItem key={label?.label} value={label?.label}>
                       {label?.name || ''}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Source credentials</InputLabel>
-            <Controller
-              name="sourceCredentials"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  label="Source credentials"
-                  // onChange={e => setValue('type', e.target.value)}
-                >
-                  {sourceIdentityOptions?.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.toString()}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Maven credentials</InputLabel>
-            <Controller
-              name="mavenCredentials"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  label="Maven credentials"
-                  // onChange={e => setValue('type', e.target.value)}
-                >
-                  {mavenIdentityOptions?.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.toString()}
                     </MenuItem>
                   ))}
                 </Select>
