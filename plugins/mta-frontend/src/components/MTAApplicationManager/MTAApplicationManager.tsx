@@ -8,6 +8,7 @@ import { Application } from '../../api/api';
 import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
 import { useApi } from '@backstage/core-plugin-api';
 import ApplicationDetails from '../AppCard/ApplicationDetails';
+import AnalysisStatusPage from '../AnalysisPage/AnalysisStatusPage';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -102,7 +103,16 @@ export const MTAApplicationManager = () => {
             <ApplicationDetails />
           </Grid>
         )}
-        {tab === 1 && <AnalysisPage />}
+        {tab === 1 && (
+          <Grid
+            container
+            spacing={2}
+            style={{ marginTop: '2vh', minHeight: '100vh' }}
+          >
+            <AnalysisPage />
+            <AnalysisStatusPage application={application} />
+          </Grid>
+        )}
       </Grid>
     </Grid>
   );

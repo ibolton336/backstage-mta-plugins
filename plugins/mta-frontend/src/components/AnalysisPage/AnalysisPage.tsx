@@ -17,6 +17,7 @@ import {
 } from '../../queries/mta';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Application } from '../../api/api';
+import { InfoCard } from '@backstage/core-components';
 
 interface IFormInput {
   type: string;
@@ -69,13 +70,8 @@ export const AnalysisPage = () => {
     }, 2000); // Simulates 2 seconds of analysis
   };
   return (
-    <Grid
-      container
-      spacing={2}
-      justifyContent="left"
-      style={{ marginTop: '2vh', minHeight: '100vh' }}
-    >
-      <Grid item xs={12} md={6}>
+    <Grid item xs={12} md={6}>
+      <InfoCard title={`Analyze Application`}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl fullWidth margin="normal">
             <InputLabel>Type</InputLabel>
@@ -129,7 +125,7 @@ export const AnalysisPage = () => {
             Analyze
           </Button>
         </form>
-      </Grid>
+      </InfoCard>
       {isAnalyzing && (
         <Grid
           item

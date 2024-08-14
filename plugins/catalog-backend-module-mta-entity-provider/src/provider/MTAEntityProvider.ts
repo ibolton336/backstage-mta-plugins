@@ -22,12 +22,12 @@ export class MTAProvider implements EntityProvider {
     scheduler: SchedulerService,
   ): MTAProvider {
     const p = new MTAProvider(config, logger, scheduler);
-    // scheduler.scheduleTask({
-    //   frequency: { seconds: 30 },
-    //   timeout: { seconds: 30 },
-    //   id: 'sync-mta-catalog',
-    //   fn: p.run,
-    // });
+    scheduler.scheduleTask({
+      frequency: { seconds: 30 },
+      timeout: { seconds: 30 },
+      id: 'sync-mta-catalog',
+      fn: p.run,
+    });
 
     return p;
   }
@@ -254,6 +254,9 @@ export class MTAProvider implements EntityProvider {
     const issuesUrl = `${this.config.getString(
       'mta.url',
     )}/issues?i%3Afilters=%7B%22application.name%22%3A%5B${encodedAppName}%5D%7D&i%3AitemsPerPage=10&i%3ApageNumber=1&i%3AsortColumn=description&i%3AsortDirection=asc`;
+    const tasksUrl = `${this.config.getString(
+      'mta.url',
+    )}/tasks?i%3Afilters=%7B%22application%22%3A%5B${encodedAppName}%5D%7D&i%3AitemsPerPage=10&i%3ApageNumber=1&i%3AsortColumn=description&i%3AsortDirection=asc`;
 
     return {
       key: application.id,
@@ -270,6 +273,8 @@ export class MTAProvider implements EntityProvider {
               'mta.url',
             )}/application/${application.id}`,
             'issues-url': issuesUrl,
+            'tasks-url': tasksUrl,
+            'mta-url': `${this.config.getString('mta.url')}`,
           },
           name: name,
           id: application.id,

@@ -4,6 +4,36 @@ import {
   createApiRef,
 } from '@backstage/core-plugin-api';
 
+export type TaskState =
+  | 'not supported'
+  | 'Canceled'
+  | 'Created'
+  | 'Succeeded'
+  | 'Failed'
+  | 'Running'
+  | 'No task'
+  | 'QuotaBlocked'
+  | 'Ready'
+  | 'Pending'
+  | 'Postponed'
+  | 'SucceededWithErrors';
+
+export interface TaskDashboard {
+  id: number;
+  createUser: string;
+  updateUser: string;
+  createTime: string; // ISO-8601
+  name: string;
+  kind?: string;
+  addon?: string;
+  state: TaskState;
+  application: Ref;
+  started?: string; // ISO-8601
+  terminated?: string; // ISO-8601
+
+  /** Count of errors recorded on the task - even Succeeded tasks may have errors. */
+  errors?: number;
+}
 export class AuthenticationError extends Error {
   public loginUrl: string;
 
@@ -110,7 +140,7 @@ export interface Identity {
 }
 
 export type Application = {
-  id: string;
+  id: number;
   name: string;
   description: string;
   buisnessService?: Ref;
@@ -136,6 +166,7 @@ export interface MTAApi {
     analysisOptions: any,
   ): Promise<any>;
   updateApplication(application: Application): Promise<Application>;
+  getTasks(): Promise<TaskDashboard[]>;
 }
 
 export const mtaApiRef = createApiRef<MTAApi>({
@@ -145,6 +176,37 @@ export const mtaApiRef = createApiRef<MTAApi>({
 export class DefaultMtaApi implements MTAApi {
   private readonly discoveryApi: DiscoveryApi;
   private readonly identityApi: IdentityApi;
+
+  async getTasks(): Promise<TaskDashboard[]> {
+    const url = await this.discoveryApi.getBaseUrl('mta');
+    const { token: idToken } = await this.identityApi.getCredentials();
+
+    const response = await fetch(`${url}/tasks`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(idToken && { Authorization: `Bearer ${idToken}` }),
+      },
+      referrerPolicy: 'no-referrer-when-downgrade',
+      redirect: 'error',
+    });
+
+    if (response.status === 401) {
+      const j = await response.json();
+      throw new AuthenticationError(j.loginURL);
+    }
+
+    if (!response.ok) {
+      throw new APIError(
+        `Request failed with status ${
+          response.status
+        }: ${await response.text()}`,
+        response.status,
+      );
+    }
+
+    return await response.json();
+  }
 
   async updateApplication(application: Application): Promise<Application> {
     const url = await this.discoveryApi.getBaseUrl('mta');
@@ -178,7 +240,9 @@ export class DefaultMtaApi implements MTAApi {
     if (response.status === 204) {
       return application;
     }
+    return application;
   }
+  // return await response;
 
   async getIdentities(): Promise<Identity[]> {
     const url = await this.discoveryApi.getBaseUrl('mta');

@@ -1,5 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Application, Identity, mtaApiRef, Target } from '../api/api';
+import {
+  Application,
+  Identity,
+  mtaApiRef,
+  Target,
+  TaskDashboard,
+} from '../api/api';
 import { useApi } from '@backstage/core-plugin-api';
 
 export const TargetsQueryKey = 'targets';
@@ -15,16 +21,13 @@ export const useUpdateApplication = (onSuccess?: () => void) => {
   const mutation = useMutation<any, Error, any>({
     mutationFn: updateApplication,
     onSuccess: data => {
-      console.log('Application updated', data);
-
       queryClient.invalidateQueries();
       if (onSuccess) {
-        console.log('Calling onSuccess');
         onSuccess();
       }
     },
     onError: error => {
-      console.error('Error updating application', error);
+      throw new Error('Error updating application');
     },
   });
 
@@ -101,5 +104,27 @@ export const useFetchIdentities = () => {
     fetchError: error,
     isError: isError,
     refetch,
+  };
+};
+
+export const useFetchAppTasks = (id: number) => {
+  const api = useApi(mtaApiRef);
+  const { isLoading, error, data, isError, isRefetching, isFetching } =
+    useQuery<TaskDashboard[]>({
+      queryKey: ['tasks'],
+      queryFn: () => api.getTasks(),
+      select: tasks =>
+        tasks
+          .filter(task => {
+            return task.application.id === id && task.kind === 'analyzer';
+          })
+          .reverse(),
+      refetchInterval: 10000,
+    });
+  return {
+    tasks: data,
+    isFetching: isFetching,
+    fetchError: error,
+    isError: isError,
   };
 };
