@@ -67,7 +67,7 @@ export const AnalysisPage = () => {
     analyzeApp(analysisParams);
     setTimeout(() => {
       setIsAnalyzing(false);
-    }, 2000); // Simulates 2 seconds of analysis
+    }, 5000); // Simulates 2 seconds of analysis
   };
   return (
     <Grid item xs={12} md={6}>
@@ -116,26 +116,25 @@ export const AnalysisPage = () => {
             />
           </FormControl>
 
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!enableAnalysis}
-            style={{ marginTop: '15px' }}
+          <Grid
+            container
+            alignItems="center"
+            spacing={2}
+            style={{ display: 'flex', marginTop: '15px' }}
           >
-            Analyze
-          </Button>
+            <Grid item>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!enableAnalysis}
+              >
+                Analyze
+              </Button>
+            </Grid>
+            <Grid item>{isAnalyzing && <CircularProgress size={24} />}</Grid>
+          </Grid>
         </form>
       </InfoCard>
-      {isAnalyzing && (
-        <Grid
-          item
-          xs={12}
-          // sx={{ display: 'flex', alignItems: 'center', mt: 2 }}
-        >
-          <CircularProgress />
-          <Typography>Analyzing...</Typography>
-        </Grid>
-      )}
     </Grid>
   );
 };
