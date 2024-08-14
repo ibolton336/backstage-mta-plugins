@@ -15,20 +15,32 @@ import {
 import { Application, Identity, Ref } from '../../api/api';
 import { LinkButton } from '@backstage/core-components';
 import { useFetchIdentities, useUpdateApplication } from '../../queries/mta';
+import { catalogApiRef, useEntity } from '@backstage/plugin-catalog-react';
+import { useApi } from '@backstage/core-plugin-api';
+import { useIsMutating } from '@tanstack/react-query';
 
 interface ApplicationDetailsFormProps {
   application: Application;
   identities: Identity[];
   isLoadingIdentities: boolean;
+  setApplication: (application: Application) => void;
+  setIsWaiting: (isWaiting: boolean) => void;
+  isWaiting: boolean;
 }
 
 export const ApplicationDetailsForm = ({
   application,
   identities,
   isLoadingIdentities,
+  setApplication,
+  setIsWaiting,
+  isWaiting,
 }: ApplicationDetailsFormProps) => {
+  const { entity } = useEntity();
+
+  const catalogApi = useApi(catalogApiRef);
+
   const getDefaultIdentityValue = (appIdentities: Ref[], kind: string) => {
-    // Just find the first matching identity from the full list that matches any from the app's list
     const appIdentityRef = appIdentities?.find(appIdentity =>
       identities?.some(
         identity => identity.id === appIdentity.id && identity.kind === kind,
@@ -85,7 +97,47 @@ export const ApplicationDetailsForm = ({
       label: identity.name,
       id: identity.id,
     }));
-  const { mutate: updateApplication } = useUpdateApplication();
+
+  const isMutating = useIsMutating();
+
+  const onSuccessCallback = () => {
+    console.log('onSuccessCallback invoked'); // Check if this callback is triggered
+
+    setIsWaiting(true);
+
+    console.log('isWaiting set to true');
+
+    const kind = entity.kind.toLowerCase(); // Convert kind to lowercase as entity refs are case-insensitive
+    const namespace = entity.metadata.namespace || 'default'; // Fallback to 'default' if namespace is not set
+    const entityName = entity.metadata.name;
+
+    const entityRef = `${kind}:${namespace}/${entityName}`;
+    catalogApi
+      .refreshEntity(entityRef)
+      .then(res => {
+        console.log('refresh res');
+        setTimeout(() => {
+          catalogApi.getEntityByRef(entityRef).then(appEntity => {
+            console.log('get entity by ref res in form', appEntity);
+            setApplication(
+              appEntity?.metadata.application as unknown as Application,
+            );
+            setIsWaiting(false);
+          });
+        }, 10000);
+        // catalogApi.getEntityByRef(entityRef).then(appEntity => {
+        //   console.log('get entity by ref res in form', appEntity);
+        //   setApplication(
+        //     appEntity?.metadata.application as unknown as Application,
+        //   );
+        // });
+      })
+      .catch(err => {
+        console.error(err);
+        setIsWaiting(false);
+      });
+  };
+  const { mutate: updateApplication } = useUpdateApplication(onSuccessCallback);
 
   const onSubmit = (formData: any) => {
     const findIdentityByName = (identityName: string) => {
@@ -104,7 +156,6 @@ export const ApplicationDetailsForm = ({
 
     const updatedApplication: Application = {
       ...application,
-      name: formData.name,
       repository: {
         url: formData.repositoryUrl,
       },
@@ -120,7 +171,9 @@ export const ApplicationDetailsForm = ({
 
     updateApplication(updatedApplication);
   };
+  const isProcessing = isSubmitting || isMutating || isWaiting;
 
+  console.log('isWaiting', isWaiting);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
@@ -131,6 +184,7 @@ export const ApplicationDetailsForm = ({
         </Grid>
         <Grid item xs={12}>
           <Controller
+            disabled
             name="name"
             control={control}
             rules={{ required: 'Application name is required' }}
@@ -228,14 +282,13 @@ export const ApplicationDetailsForm = ({
               Object.keys(errors).length > 0 ||
               !sourceCredentials ||
               !mavenCredentials ||
-              !name ||
               !repositoryUrl
             }
           >
             Update
           </Button>
         </Grid>
-        {isSubmitting && (
+        {isProcessing && (
           <Grid item xs={12}>
             <CircularProgress />
             <Typography>Updating...</Typography>

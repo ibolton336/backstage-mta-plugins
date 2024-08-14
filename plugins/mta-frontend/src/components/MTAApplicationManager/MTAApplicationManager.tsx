@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid, Tab, Tabs, makeStyles } from '@material-ui/core';
 import { LinkButton, ResponseErrorPanel } from '@backstage/core-components';
-import { useEntity } from '@backstage/plugin-catalog-react';
+import { catalogApiRef, useEntity } from '@backstage/plugin-catalog-react';
 import { AppCard } from '../AppCard/AppCard';
 import { AnalysisPage } from '../AnalysisPage/AnalysisPage';
 import { Application } from '../../api/api';
 import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
+import { useApi } from '@backstage/core-plugin-api';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,9 +27,34 @@ const useStyles = makeStyles(theme => ({
 
 export const MTAApplicationManager = () => {
   const classes = useStyles();
-  const entity = useEntity();
-  const application = entity?.entity?.metadata
+  const { entity } = useEntity();
+  const catalogApi = useApi(catalogApiRef);
+  const initialApplication = entity.metadata
     .application as unknown as Application;
+
+  const [application, setApplication] =
+    useState<Application>(initialApplication);
+  const [isWaiting, setIsWaiting] = React.useState(false);
+  console.log('application', application);
+
+  React.useEffect(() => {
+    if (entity) {
+      // Initially load the application data based on the entity
+      catalogApi
+        .getEntityByRef(
+          `${entity.kind.toLowerCase()}:${
+            entity.metadata.namespace || 'default'
+          }/${entity.metadata.name}`,
+        )
+        .then(appEntity => {
+          setApplication(
+            appEntity?.metadata.application as unknown as Application,
+          );
+        })
+        .catch(error => console.error('Failed to load entity', error));
+    }
+  }, []);
+
   const [tab, setTab] = React.useState(0);
 
   const handleTabChange = (event, newValue) => {
@@ -48,7 +74,12 @@ export const MTAApplicationManager = () => {
 
   return (
     <Grid container direction="column" className={classes.root}>
-      <ApplicationDetailsHeader application={application} />
+      <ApplicationDetailsHeader
+        application={application}
+        setApplication={setApplication}
+        isWaiting={isWaiting}
+        setIsWaiting={setIsWaiting}
+      />
       <Grid item xs={12} className={classes.tabBar}>
         <Tabs
           variant="fullWidth"

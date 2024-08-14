@@ -4,7 +4,7 @@ import { useApi } from '@backstage/core-plugin-api';
 
 export const TargetsQueryKey = 'targets';
 
-export const useUpdateApplication = () => {
+export const useUpdateApplication = (onSuccess?: () => void) => {
   const api = useApi(mtaApiRef);
   const queryClient = useQueryClient();
 
@@ -14,8 +14,17 @@ export const useUpdateApplication = () => {
 
   const mutation = useMutation<any, Error, any>({
     mutationFn: updateApplication,
-    onSuccess: () => {
+    onSuccess: data => {
+      console.log('Application updated', data);
+
       queryClient.invalidateQueries();
+      if (onSuccess) {
+        console.log('Calling onSuccess');
+        onSuccess();
+      }
+    },
+    onError: error => {
+      console.error('Error updating application', error);
     },
   });
 
@@ -65,9 +74,6 @@ export const useAnalyzeApplication = (
   >({
     mutationFn: analyzeApplications,
     onSuccess: data => {
-      if (data instanceof URL) {
-        window.location.href = data.toString(); // handle redirection
-      }
       if (options?.onSuccess) {
         options.onSuccess();
         queryClient.invalidateQueries();

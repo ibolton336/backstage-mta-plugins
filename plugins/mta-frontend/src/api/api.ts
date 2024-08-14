@@ -174,7 +174,10 @@ export class DefaultMtaApi implements MTAApi {
       );
     }
 
-    return await response.json();
+    // return await response.json();
+    if (response.status === 204) {
+      return application;
+    }
   }
 
   async getIdentities(): Promise<Identity[]> {
