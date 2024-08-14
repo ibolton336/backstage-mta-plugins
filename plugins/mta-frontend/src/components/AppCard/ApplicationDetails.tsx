@@ -2,28 +2,26 @@ import React from 'react';
 import { InfoCard, LinkButton } from '@backstage/core-components';
 import {
   Grid,
-  Typography,
   List,
   ListItem,
   ListItemText,
-  Chip,
-  Box,
   makeStyles,
   ListItemSecondaryAction,
 } from '@material-ui/core';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Application } from '../../api/api';
+import TagList from './TagList';
 
 const useStyles = makeStyles(theme => ({
   listItem: {
-    paddingLeft: theme.spacing(2), // Adds padding to align text if needed
-    paddingRight: theme.spacing(2), // Ensure right padding for better alignment
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
   },
   listItemText: {
-    overflowWrap: 'break-word', // Ensures text wraps and doesn't overflow
+    overflowWrap: 'break-word',
   },
   chip: {
-    margin: theme.spacing(1), // Standardizes spacing around chips
+    margin: theme.spacing(1),
   },
 }));
 
@@ -34,7 +32,6 @@ const ApplicationDetails = () => {
     .application as unknown as Application;
   const annotations = entity?.entity?.metadata?.annotations || {};
   const viewUrl = annotations['issues-url'] || '';
-  const appUrl = application?.repository?.url || 'No URL provided';
 
   if (!application) {
     return null;
@@ -59,23 +56,20 @@ const ApplicationDetails = () => {
               </ListItemSecondaryAction>
             </ListItem>
             <ListItem className={classes.listItem}>
-              <ListItemText primary="Tags" className={classes.listItemText} />
+              <ListItemText
+                primary="Tags"
+                className={classes.listItemText}
+                secondary={
+                  application.tags && application.tags.length > 0 ? (
+                    <Grid item xs={12}>
+                      <TagList tags={application.tags} />
+                    </Grid>
+                  ) : (
+                    'None'
+                  )
+                }
+              />
             </ListItem>
-            <Grid item xs={12}>
-              {application.tags && application.tags.length > 0 ? (
-                application.tags.map(tag => (
-                  <Chip
-                    key={tag.name}
-                    label={`Source: ${tag.source || 'Unknown'}, Name: ${
-                      tag.name
-                    }`}
-                    className={classes.chip}
-                  />
-                ))
-              ) : (
-                <Typography variant="body2">No Tags</Typography>
-              )}
-            </Grid>
             <ListItem className={classes.listItem}>
               <ListItemText
                 primary="Risk Level"

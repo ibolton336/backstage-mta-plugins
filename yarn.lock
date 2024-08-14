@@ -6856,6 +6856,7 @@ __metadata:
     msw: ^1.0.0
     react-hook-form: ^7.52.1
     react-use: ^17.2.4
+    react-window: ^1.8.10
   peerDependencies:
     react: ^16.13.1 || ^17.0.0
   languageName: unknown

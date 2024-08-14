@@ -45,11 +45,6 @@ data:
             - mountPoint: entity.page.mta/cards
               importName: EntityMTAContent
               config:
-                layout:
-                  gridColumn:
-                    lg: 'span 16'
-                    md: 'span 14'
-                    xs: 'span 12'
                 if:
                   allOf:
                     - isKind: component 
