@@ -21,8 +21,6 @@ import { Application } from '../../api/api';
 interface IFormInput {
   type: string;
   targetList: string[];
-  sourceCredentials?: string;
-  mavenCredentials?: string;
 }
 
 export const AnalysisPage = () => {
@@ -49,16 +47,11 @@ export const AnalysisPage = () => {
       )
     : [];
 
-  const [type, targetList, sourceCredentials, mavenCredentials] = watch([
-    'type',
-    'targetList',
-    'sourceCredentials',
-    'mavenCredentials',
-  ]);
-  const enableAnalysis =
-    type && targetList.length > 0 && sourceCredentials && mavenCredentials;
+  const [type, targetList] = watch(['type', 'targetList']);
+  const enableAnalysis = type && targetList.length > 0;
 
-  const onSubmit = (data: IFormInput) => {
+  const onSubmit = (data: IFormInput, event: any) => {
+    event.preventDefault();
     setIsAnalyzing(true);
     const app = entity.entity.metadata.application as unknown as Application;
     const analysisParams = {
@@ -79,7 +72,7 @@ export const AnalysisPage = () => {
     <Grid
       container
       spacing={2}
-      justifyContent="center"
+      justifyContent="left"
       style={{ marginTop: '2vh', minHeight: '100vh' }}
     >
       <Grid item xs={12} md={6}>

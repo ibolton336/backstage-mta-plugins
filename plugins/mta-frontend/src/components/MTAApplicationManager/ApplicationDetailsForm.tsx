@@ -98,8 +98,6 @@ export const ApplicationDetailsForm = ({
       id: identity.id,
     }));
 
-  const isMutating = useIsMutating();
-
   const onSuccessCallback = () => {
     console.log('onSuccessCallback invoked'); // Check if this callback is triggered
 
@@ -139,7 +137,9 @@ export const ApplicationDetailsForm = ({
   };
   const { mutate: updateApplication } = useUpdateApplication(onSuccessCallback);
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = (formData: any, event: any) => {
+    // preventDefault();V
+    event.preventDefault();
     const findIdentityByName = (identityName: string) => {
       return identities?.find(option => option.name === identityName);
     };
@@ -171,17 +171,12 @@ export const ApplicationDetailsForm = ({
 
     updateApplication(updatedApplication);
   };
-  const isProcessing = isSubmitting || isMutating || isWaiting;
+  const isProcessing = isSubmitting || isWaiting;
+  console.log('isProcessing', isProcessing, isSubmitting, isWaiting);
 
-  console.log('isWaiting', isWaiting);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h5" gutterBottom style={{ fontWeight: 400 }}>
-            Application Details
-          </Typography>
-        </Grid>
         <Grid item xs={12}>
           <Controller
             disabled

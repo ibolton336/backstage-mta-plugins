@@ -7,6 +7,7 @@ import { AnalysisPage } from '../AnalysisPage/AnalysisPage';
 import { Application } from '../../api/api';
 import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
 import { useApi } from '@backstage/core-plugin-api';
+import ApplicationDetails from '../AppCard/ApplicationDetails';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -74,12 +75,6 @@ export const MTAApplicationManager = () => {
 
   return (
     <Grid container direction="column" className={classes.root}>
-      <ApplicationDetailsHeader
-        application={application}
-        setApplication={setApplication}
-        isWaiting={isWaiting}
-        setIsWaiting={setIsWaiting}
-      />
       <Grid item xs={12} className={classes.tabBar}>
         <Tabs
           variant="fullWidth"
@@ -92,20 +87,23 @@ export const MTAApplicationManager = () => {
           <Tab label="Application Details" />
           <Tab label="Analysis" />
         </Tabs>
-        {tab === 0 && <AppCard />}
+        {tab === 0 && (
+          <Grid
+            container
+            spacing={2}
+            style={{ marginTop: '2vh', minHeight: '100vh' }}
+          >
+            <ApplicationDetailsHeader
+              application={application}
+              setApplication={setApplication}
+              isWaiting={isWaiting}
+              setIsWaiting={setIsWaiting}
+            />
+            <ApplicationDetails />
+          </Grid>
+        )}
         {tab === 1 && <AnalysisPage />}
       </Grid>
-      {/* {tab === 0 && (
-        <Grid item xs={12} className={classes.tabPanel} role="tabpanel">
-          <AppCard />
-        </Grid>
-      )}
-      {tab === 1 && (
-        <Grid item xs={12} className={classes.tabPanel} role="tabpanel">
-          <AnalysisPage />
-        </Grid>
-      )} */}
-      {/* <Grid item xs={12} key={tab}></Grid> */}
     </Grid>
   );
 };

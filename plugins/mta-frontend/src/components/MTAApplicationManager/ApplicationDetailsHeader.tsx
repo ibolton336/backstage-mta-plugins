@@ -6,7 +6,7 @@ import {
   Grid,
   CircularProgress,
 } from '@material-ui/core';
-import { LinkButton } from '@backstage/core-components';
+import { InfoCard, LinkButton } from '@backstage/core-components';
 import { Application } from '../../api/api';
 import { ApplicationDetailsForm } from './ApplicationDetailsForm';
 import { useFetchIdentities } from '../../queries/mta';
@@ -27,22 +27,36 @@ export const ApplicationDetailsHeader = ({
 }: ApplicationDetailsHeaderProps) => {
   const isMutating = useIsMutating();
   const { identities, isFetching } = useFetchIdentities();
-  if (isFetching || isMutating || isWaiting) {
+  console.log(
+    'isFetching, ismutating, iswaitning',
+    isFetching,
+    isMutating,
+    isWaiting,
+  );
+  if (isFetching || isWaiting) {
     return (
-      <Box display="flex" justifyContent="center">
-        <CircularProgress />
-      </Box>
+      <Grid item xs={12} md={6}>
+        <InfoCard title={`MTA Application`} subheader={`${application.name}`}>
+          <Box display="flex" justifyContent="center">
+            <CircularProgress />
+          </Box>
+        </InfoCard>
+      </Grid>
     );
   }
   return (
-    <ApplicationDetailsForm
-      application={application}
-      setApplication={setApplication}
-      identities={identities || []}
-      isLoadingIdentities={isFetching}
-      setIsWaiting={setIsWaiting}
-      isWaiting={isWaiting}
-    />
+    <Grid item xs={12} md={6}>
+      <InfoCard title={`MTA Application`} subheader={`${application.name}`}>
+        <ApplicationDetailsForm
+          application={application}
+          setApplication={setApplication}
+          identities={identities || []}
+          isLoadingIdentities={isFetching}
+          setIsWaiting={setIsWaiting}
+          isWaiting={isWaiting}
+        />
+      </InfoCard>
+    </Grid>
   );
 };
 
