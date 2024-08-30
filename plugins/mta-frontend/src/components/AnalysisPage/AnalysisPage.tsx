@@ -7,14 +7,9 @@ import {
   Select,
   CircularProgress,
   Grid,
-  Typography,
 } from '@material-ui/core';
-import { useForm, Controller, Form } from 'react-hook-form';
-import {
-  useFetchTargets,
-  useAnalyzeApplication,
-  useFetchIdentities,
-} from '../../queries/mta';
+import { useForm, Controller } from 'react-hook-form';
+import { useFetchTargets, useAnalyzeApplication } from '../../queries/mta';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Application } from '../../api/api';
 import { InfoCard } from '@backstage/core-components';
@@ -35,7 +30,6 @@ export const AnalysisPage = () => {
   const entity = useEntity();
 
   const { targets } = useFetchTargets();
-  const { identities } = useFetchIdentities();
 
   const { mutate: analyzeApp } = useAnalyzeApplication({});
 
@@ -71,7 +65,7 @@ export const AnalysisPage = () => {
   };
   return (
     <Grid item xs={12} md={6}>
-      <InfoCard title={`Analyze Application`}>
+      <InfoCard title="Analyze Application">
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl fullWidth margin="normal">
             <InputLabel>Type</InputLabel>

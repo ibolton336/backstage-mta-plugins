@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
@@ -14,10 +14,9 @@ import {
 } from '@material-ui/core';
 import { Application, Identity, Ref } from '../../api/api';
 import { LinkButton } from '@backstage/core-components';
-import { useFetchIdentities, useUpdateApplication } from '../../queries/mta';
+import { useUpdateApplication } from '../../queries/mta';
 import { catalogApiRef, useEntity } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
-import { useIsMutating } from '@tanstack/react-query';
 
 interface ApplicationDetailsFormProps {
   application: Application;
@@ -31,7 +30,6 @@ interface ApplicationDetailsFormProps {
 export const ApplicationDetailsForm = ({
   application,
   identities,
-  isLoadingIdentities,
   setApplication,
   setIsWaiting,
   isWaiting,
@@ -63,8 +61,6 @@ export const ApplicationDetailsForm = ({
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-    reset,
-    getValues,
   } = useForm({
     defaultValues: useMemo(() => {
       return {
@@ -73,14 +69,13 @@ export const ApplicationDetailsForm = ({
         sourceCredentials: defaultSourceIdentity,
         mavenCredentials: defaultMavenIdentity,
       };
-    }, [application, identities, defaultSourceIdentity, defaultMavenIdentity]),
+    }, [application, defaultSourceIdentity, defaultMavenIdentity]),
 
     mode: 'onSubmit', // Validation will trigger on the change event with each input field
   });
 
   const sourceCredentials = watch('sourceCredentials');
   const mavenCredentials = watch('mavenCredentials');
-  const name = watch('name');
   const repositoryUrl = watch('repositoryUrl');
 
   const sourceIdentityOptions = identities
@@ -99,12 +94,7 @@ export const ApplicationDetailsForm = ({
     }));
 
   const onSuccessCallback = () => {
-    console.log('onSuccessCallback invoked'); // Check if this callback is triggered
-
     setIsWaiting(true);
-
-    console.log('isWaiting set to true');
-
     const kind = entity.kind.toLowerCase(); // Convert kind to lowercase as entity refs are case-insensitive
     const namespace = entity.metadata.namespace || 'default'; // Fallback to 'default' if namespace is not set
     const entityName = entity.metadata.name;
@@ -112,26 +102,17 @@ export const ApplicationDetailsForm = ({
     const entityRef = `${kind}:${namespace}/${entityName}`;
     catalogApi
       .refreshEntity(entityRef)
-      .then(res => {
-        console.log('refresh res');
+      .then(() => {
         setTimeout(() => {
           catalogApi.getEntityByRef(entityRef).then(appEntity => {
-            console.log('get entity by ref res in form', appEntity);
             setApplication(
               appEntity?.metadata.application as unknown as Application,
             );
             setIsWaiting(false);
           });
         }, 10000);
-        // catalogApi.getEntityByRef(entityRef).then(appEntity => {
-        //   console.log('get entity by ref res in form', appEntity);
-        //   setApplication(
-        //     appEntity?.metadata.application as unknown as Application,
-        //   );
-        // });
       })
-      .catch(err => {
-        console.error(err);
+      .catch(() => {
         setIsWaiting(false);
       });
   };
@@ -172,7 +153,6 @@ export const ApplicationDetailsForm = ({
     updateApplication(updatedApplication);
   };
   const isProcessing = isSubmitting || isWaiting;
-  console.log('isProcessing', isProcessing, isSubmitting, isWaiting);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -226,7 +206,7 @@ export const ApplicationDetailsForm = ({
               name="sourceCredentials"
               control={control}
               rules={{ required: 'Source credentials are required' }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ field }) => (
                 <Select {...field} label="Source Credentials">
                   {sourceIdentityOptions?.map(option => (
                     <MenuItem key={option.value} value={option.value}>
@@ -250,7 +230,7 @@ export const ApplicationDetailsForm = ({
               name="mavenCredentials"
               control={control}
               rules={{ required: 'Maven credentials are required' }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ field }) => (
                 <Select {...field} label="Maven Credentials">
                   {mavenIdentityOptions?.map(option => (
                     <MenuItem key={option.value} value={option.value}>

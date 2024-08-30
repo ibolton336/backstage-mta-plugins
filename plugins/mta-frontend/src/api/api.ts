@@ -162,7 +162,7 @@ export interface MTAApi {
   getTargets(): Promise<Target[]>;
   getIdentities(): Promise<Identity[]>;
   analyzeMTAApplications(
-    applicationId: string,
+    applicationId: number,
     analysisOptions: any,
   ): Promise<any>;
   updateApplication(application: Application): Promise<Application>;
@@ -307,7 +307,7 @@ export class DefaultMtaApi implements MTAApi {
   }
 
   async analyzeMTAApplications(
-    applicationId: string,
+    applicationId: number,
     analysisOptions: any,
   ): Promise<Application> {
     const url = await this.discoveryApi.getBaseUrl('mta');

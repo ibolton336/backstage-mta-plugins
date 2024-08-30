@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircularProgress, Grid } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { useFetchAppTasks } from '../../queries/mta';
 import { Application } from '../../api/api';
 import { InfoCard } from '@backstage/core-components';
@@ -13,7 +13,7 @@ const AnalysisStatusPage = (props: IAnalysisStatusPageProps) => {
   const { tasks, isFetching } = useFetchAppTasks(application.id);
   return (
     <Grid item xs={12} md={6}>
-      <InfoCard title={`Analysis Details`}>
+      <InfoCard title="Analysis Details">
         <TaskTable tasks={tasks} isFetching={isFetching} />
       </InfoCard>
     </Grid>

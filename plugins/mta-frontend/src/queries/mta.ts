@@ -20,13 +20,13 @@ export const useUpdateApplication = (onSuccess?: () => void) => {
 
   const mutation = useMutation<any, Error, any>({
     mutationFn: updateApplication,
-    onSuccess: data => {
+    onSuccess: () => {
       queryClient.invalidateQueries();
       if (onSuccess) {
         onSuccess();
       }
     },
-    onError: error => {
+    onError: () => {
       throw new Error('Error updating application');
     },
   });
@@ -50,7 +50,7 @@ export const useFetchTargets = () => {
 };
 
 interface AnalyzeApplicationParams {
-  selectedApp: string;
+  selectedApp: number;
   analysisOptions: any;
 }
 interface UseAnalyzeApplicationOptions {
@@ -76,7 +76,7 @@ export const useAnalyzeApplication = (
     AnalyzeApplicationParams
   >({
     mutationFn: analyzeApplications,
-    onSuccess: data => {
+    onSuccess: () => {
       if (options?.onSuccess) {
         options.onSuccess();
         queryClient.invalidateQueries();
@@ -109,20 +109,19 @@ export const useFetchIdentities = () => {
 
 export const useFetchAppTasks = (id: number) => {
   const api = useApi(mtaApiRef);
-  const { isLoading, error, data, isError, isRefetching, isFetching } =
-    useQuery<TaskDashboard[]>({
-      queryKey: ['tasks'],
-      queryFn: () => api.getTasks(),
-      select: tasks =>
-        tasks
-          .filter(task => {
-            return task.application.id === id && task.kind === 'analyzer';
-          })
-          .reverse(),
-      refetchInterval: 10000,
-    });
+  const { error, data, isError, isFetching } = useQuery<TaskDashboard[]>({
+    queryKey: ['tasks'],
+    queryFn: () => api.getTasks(),
+    select: tasks =>
+      tasks
+        .filter(task => {
+          return task.application.id === id && task.kind === 'analyzer';
+        })
+        .reverse(),
+    refetchInterval: 10000,
+  });
   return {
-    tasks: data,
+    tasks: data || [],
     isFetching: isFetching,
     fetchError: error,
     isError: isError,

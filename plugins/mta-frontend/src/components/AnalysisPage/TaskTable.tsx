@@ -15,11 +15,10 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import ErrorIcon from '@material-ui/icons/Error';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
-import { Application, TaskDashboard } from '../../api/api';
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { TaskDashboard } from '../../api/api';
 import { useEntity } from '@backstage/plugin-catalog-react';
 
-const getIconForState = state => {
+const getIconForState = (state: string) => {
   switch (state) {
     case 'Succeeded':
       return <CheckCircleIcon style={{ color: 'green' }} />;
@@ -31,7 +30,6 @@ const getIconForState = state => {
       return <PauseCircleFilledIcon style={{ color: 'orange' }} />;
     case 'SucceededWithErrors':
       return <ErrorIcon style={{ color: 'yellow' }} />;
-    // Add more cases for other states...
     default:
       return <ErrorIcon style={{ color: 'gray' }} />;
   }
@@ -42,15 +40,11 @@ interface ITaskTableProps {
 }
 
 const TaskTable = ({ tasks, isFetching }: ITaskTableProps) => {
-  const config = useApi(configApiRef);
-
   const entity = useEntity();
-  const application = entity?.entity?.metadata
-    .application as unknown as Application;
   const annotations = entity?.entity?.metadata?.annotations || {};
   const mtaUrl = annotations['mta-url'] || '';
 
-  const isValidDate = date => {
+  const isValidDate = (date: Date) => {
     return date instanceof Date && !isNaN(date.getTime());
   };
 
@@ -85,13 +79,13 @@ const TaskTable = ({ tasks, isFetching }: ITaskTableProps) => {
                 </div>
               </TableCell>
               <TableCell>
-                {isValidDate(new Date(task.started))
-                  ? new Date(task.started).toLocaleString()
+                {isValidDate(new Date(task.started || ''))
+                  ? new Date(task.started || '').toLocaleString()
                   : 'N/A'}
               </TableCell>
               <TableCell>
-                {isValidDate(new Date(task.terminated))
-                  ? new Date(task.terminated).toLocaleString()
+                {isValidDate(new Date(task.terminated || ''))
+                  ? new Date(task.terminated || '').toLocaleString()
                   : 'N/A'}
               </TableCell>
               <TableCell>

@@ -39,7 +39,7 @@ const ApplicationDetails = () => {
 
   return (
     <Grid item xs={12} md={6}>
-      <InfoCard title={`Advanced Details`}>
+      <InfoCard title="Advanced Details">
         <List dense>
           <ListItem className={classes.listItem}>
             <ListItemText primary="Issues" className={classes.listItemText} />

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, Tab, Tabs, makeStyles } from '@material-ui/core';
-import { LinkButton, ResponseErrorPanel } from '@backstage/core-components';
+import { ResponseErrorPanel } from '@backstage/core-components';
 import { catalogApiRef, useEntity } from '@backstage/plugin-catalog-react';
-import { AppCard } from '../AppCard/AppCard';
 import { AnalysisPage } from '../AnalysisPage/AnalysisPage';
 import { Application } from '../../api/api';
 import { ApplicationDetailsHeader } from './ApplicationDetailsHeader';
@@ -22,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     flex: '1 0 auto', // Prevents flex items from shrinking
   },
   tabBar: {
-    borderBottom: '1px solid ' + theme.palette.divider,
+    borderBottom: `1px solid ${theme.palette.divider}`,
     marginBottom: theme.spacing(2),
   },
 }));
@@ -37,11 +36,9 @@ export const MTAApplicationManager = () => {
   const [application, setApplication] =
     useState<Application>(initialApplication);
   const [isWaiting, setIsWaiting] = React.useState(false);
-  console.log('application', application);
 
   React.useEffect(() => {
     if (entity) {
-      // Initially load the application data based on the entity
       catalogApi
         .getEntityByRef(
           `${entity.kind.toLowerCase()}:${
@@ -53,13 +50,17 @@ export const MTAApplicationManager = () => {
             appEntity?.metadata.application as unknown as Application,
           );
         })
-        .catch(error => console.error('Failed to load entity', error));
+        .catch(error => {
+          throw new Error(
+            `Error fetching application entity: ${error.message}`,
+          );
+        });
     }
-  }, []);
+  }, [entity, catalogApi]);
 
   const [tab, setTab] = React.useState(0);
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (newValue: any) => {
     setTab(newValue);
   };
 
@@ -80,7 +81,7 @@ export const MTAApplicationManager = () => {
         <Tabs
           variant="fullWidth"
           value={tab}
-          onChange={handleTabChange}
+          onChange={(_, value) => handleTabChange(value)}
           indicatorColor="primary"
           textColor="primary"
           aria-label="application tabs"

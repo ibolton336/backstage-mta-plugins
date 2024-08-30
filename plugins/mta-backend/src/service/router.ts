@@ -429,11 +429,11 @@ export async function createRouter(
         res.status(204).json({ message: 'No Content' });
         return res;
       }
-      // const jsonResponse = await fetchResponse.json(); // Assuming the successful response is JSON
-      // res.json(jsonResponse);
+      return undefined;
     } catch (error) {
       console.error('Error updating application:', error);
       res.status(500).json({ error: 'Internal Server Error' });
+      return undefined;
     }
   });
 

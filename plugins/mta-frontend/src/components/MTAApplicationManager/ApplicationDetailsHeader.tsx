@@ -1,16 +1,9 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Link,
-  Grid,
-  CircularProgress,
-} from '@material-ui/core';
-import { InfoCard, LinkButton } from '@backstage/core-components';
+import { Box, Grid, CircularProgress } from '@material-ui/core';
+import { InfoCard } from '@backstage/core-components';
 import { Application } from '../../api/api';
 import { ApplicationDetailsForm } from './ApplicationDetailsForm';
 import { useFetchIdentities } from '../../queries/mta';
-import { useIsMutating } from '@tanstack/react-query';
 
 interface ApplicationDetailsHeaderProps {
   application: Application;
@@ -25,18 +18,11 @@ export const ApplicationDetailsHeader = ({
   isWaiting,
   setIsWaiting,
 }: ApplicationDetailsHeaderProps) => {
-  const isMutating = useIsMutating();
   const { identities, isFetching } = useFetchIdentities();
-  console.log(
-    'isFetching, ismutating, iswaitning',
-    isFetching,
-    isMutating,
-    isWaiting,
-  );
   if (isFetching || isWaiting) {
     return (
       <Grid item xs={12} md={6}>
-        <InfoCard title={`MTA Application`} subheader={`${application.name}`}>
+        <InfoCard title="MTA Application" subheader={`${application.name}`}>
           <Box display="flex" justifyContent="center">
             <CircularProgress />
           </Box>
@@ -46,7 +32,7 @@ export const ApplicationDetailsHeader = ({
   }
   return (
     <Grid item xs={12} md={6}>
-      <InfoCard title={`MTA Application`} subheader={`${application.name}`}>
+      <InfoCard title="MTA Application" subheader={`${application.name}`}>
         <ApplicationDetailsForm
           application={application}
           setApplication={setApplication}

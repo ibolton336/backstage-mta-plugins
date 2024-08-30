@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Grid, Typography } from '@material-ui/core';
+import { Divider, Grid } from '@material-ui/core';
 import {
   Header,
   Page,
